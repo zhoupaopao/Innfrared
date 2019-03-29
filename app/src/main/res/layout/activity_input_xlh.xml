@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
+    android:background="@color/bg_screen"
+    xmlns:android="http://schemas.android.com/apk/res/android" >
+    <include layout="@layout/layout_title_back_icon1" android:id="@+id/toplayout"/>
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/x52"
+        android:padding="@dimen/x12"
+        android:background="@color/white"
+        android:layout_marginTop="@dimen/x18"
+        android:layout_below="@id/toplayout"
+        >
+        <TextView
+            android:id="@+id/tv_xlh"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_centerVertical="true"
+            android:textSize="@dimen/x16"
+            android:text="@string/xlh"/>
+        <EditText
+            android:id="@+id/et_xlh"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_alignParentRight="true"
+            android:background="@null"
+            android:textSize="@dimen/x16"
+            android:gravity="right"
+            android:layout_toRightOf="@id/tv_xlh"
+            android:maxLines="1"
+            android:maxLength="12"
+            android:inputType="number"
+            android:hint="@string/pinputxlh"/>
+    </RelativeLayout>
+    <Button
+        android:id="@+id/next"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/x42"
+        android:layout_alignParentBottom="true"
+        android:layout_margin="@dimen/x25"
+        android:background="@drawable/btn_blue"
+        android:text="@string/sure"
+        android:textColor="@color/white" />
+
+</RelativeLayout>

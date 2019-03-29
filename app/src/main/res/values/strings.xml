@@ -1,0 +1,35 @@
+<resources>
+    <string name="app_name">Infrared</string>
+
+    <string name="notifyTitle">提示</string>
+    <string name="notifyMsg">当前应用缺少必要权限。\n\n请点击\"设置\"-\"权限\"-打开所需权限。</string>
+    <string name="setting">设置</string>
+    <string name="cancel">取消</string>
+    <string name="fastsetting">快速配置</string>
+    <string name="scjq">SOLARMAN采集器</string>
+    <string name="inputxlh">输入序列号</string>
+    <string name="pinputxlh">请输入序列号</string>
+    <string name="xlh">序列号</string>
+    <string name="now_sn">当前采集器SN</string>
+    <string name="pp_db">已匹配电表</string>
+    <string name="add_db">添加电表</string>
+    <string name="first_step">第一步、检查红外接口</string>
+    <string name="second_step">第二步、安装位置确认</string>
+    <string name="third_step">第三步、接线方案</string>
+    <string name="forth_step">第四步、连接两台电表</string>
+    <string name="fifth_step">第五步、走线安排</string>
+    <string name="sixth_step">第六步、设备安装</string>
+    <string name="seventh_step">第七步、导轨电源与采集器</string>
+    <string name="eighth_step">第八步、确认通信成功</string>
+    <string name="check_integer">检查红外接口</string>
+    <string name="install_address_sure">安装位置确认</string>
+    <string name="next_sure">下一步 安装位置确认</string>
+    <string name="next_sure2">下一步 接线方案</string>
+    <string name="next_sure3">下一步 连接两台电表</string>
+    <string name="next_sure4">下一步 走线安排</string>
+    <string name="next_sure5">下一步 设备安装</string>
+    <string name="next_sure6">下一步 导轨电源与采集器</string>
+    <string name="next_sure7">下一步 确认通信成功</string>
+    <string name="next_sure8">开始电表配置</string>
+    <string name="sure">确认</string>
+</resources>

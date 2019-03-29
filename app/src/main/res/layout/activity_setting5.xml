@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true">
+
+    <include
+        android:id="@+id/title"
+        layout="@layout/layout_title_back" />
+    <ScrollView
+        android:id="@+id/scroll_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/title"
+        android:background="@color/bg_screen"
+        android:fillViewport="true">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingBottom="100dp">
+            <!--添加具体的布局-->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="@dimen/x10"
+                android:text="@string/fifth_step"
+                android:textSize="@dimen/x16" />
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="@dimen/x14"
+                android:layout_marginLeft="@dimen/x10"
+                android:layout_marginRight="@dimen/x10"
+                android:background="@drawable/bg_radius">
+                <ImageView
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/x200"
+                    android:src="@mipmap/sc0501"
+                    android:paddingLeft="@dimen/x10"
+                    android:paddingRight="@dimen/x10"
+                    />
+                <ImageView
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/x200"
+                    android:src="@mipmap/sc0502"
+                    android:layout_marginTop="@dimen/x14"
+                    android:paddingLeft="@dimen/x10"
+                    android:paddingRight="@dimen/x10"
+                    />
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingTop="@dimen/x10"
+                    android:text="延长布线请按照现场情况选择桥架或者地板下走线"/>
+            </LinearLayout>
+
+
+
+        </LinearLayout>
+
+    </ScrollView>
+
+    <Button
+        android:id="@+id/next"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/x42"
+        android:layout_alignParentBottom="true"
+        android:layout_margin="@dimen/x30"
+        android:background="@drawable/btn_blue"
+        android:text="@string/next_sure5"
+        android:textColor="@color/white" />
+</RelativeLayout>
