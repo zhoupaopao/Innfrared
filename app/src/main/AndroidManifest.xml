@@ -41,6 +41,9 @@
         <activity android:name="com.example.innfrared.AmmeterSettingActivity"/>
         <activity android:name=".LookDataActivity"/>
         <activity android:name=".SettingLoadingActivity" />
+        <activity android:name=".SettingFinishActivity"/>
+        <activity android:name=".SettingFinishSuccessActivity"/>
+        <activity android:name=".CheckDataActivity"/>
     </application>
 
 </manifest>

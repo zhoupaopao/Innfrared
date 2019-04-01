@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
+    android:orientation="vertical"
+    xmlns:android="http://schemas.android.com/apk/res/android" >
+    <include layout="@layout/layout_title_back" android:id="@+id/title_layout" />
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/title_layout"
+        android:background="@color/white"
+        android:layout_marginTop="@dimen/x18">
+        <include layout="@layout/layout_setting_finish_top" android:id="@+id/ll1"/>
+
+        <Button
+            android:id="@+id/next"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/x42"
+            android:layout_alignParentBottom="true"
+            android:layout_margin="@dimen/x25"
+            android:background="@drawable/btn_blue"
+            android:text="@string/check_data"
+            android:textColor="@color/white" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_below="@+id/ll1"
+            android:layout_marginTop="@dimen/x30"
+            android:gravity="center_horizontal"
+            android:orientation="vertical"
+            android:id="@+id/linearLayout">
+            <ImageView
+                android:layout_width="@dimen/x130"
+                android:layout_height="@dimen/x200"
+                android:layout_alignTop="@+id/linearLayout"
+                android:layout_centerHorizontal="true"
+                android:src="@mipmap/updata" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/black"
+                android:text="@string/data_success"/>
+
+        </LinearLayout>
+
+
+    </RelativeLayout>
+
+</LinearLayout>

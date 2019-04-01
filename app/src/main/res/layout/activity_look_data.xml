@@ -30,14 +30,17 @@
         <RelativeLayout
             android:layout_below="@id/tv_status"
             android:padding="@dimen/x20"
-            android:layout_marginTop="@dimen/x30"
+            android:layout_marginTop="@dimen/x42"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
             <ProgressBar
                 android:id="@+id/progressbar"
                 android:layout_width="match_parent"
-                android:layout_height="@dimen/x30" />
+                style="@style/Base.Widget.AppCompat.ProgressBar.Horizontal"
+                android:max="100"
+                android:progressDrawable="@drawable/progress_blue"
+                android:layout_height="@dimen/x8" />
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

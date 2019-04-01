@@ -39,6 +39,12 @@
     <string name="sure">确认</string>
     <string name="back">返回</string>
     <string name="setting_fail">配置未完成</string>
+    <string name="setting_success">配置完成</string>
     <string name="setting_db">配置电表</string>
     <string name="five_loading">数据约5分钟后上传,请耐心等待</string>
+    <string name="none_data">无数据</string>
+    <string name="data_success">数据上传成功</string>
+    <string name="none_data_msg">请确认电表编号与安装位置是否准确</string>
+    <string name="check_data">数据校验</string>
+    <string name="know">我知道了</string>
 </resources>

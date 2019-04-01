@@ -204,9 +204,7 @@ public class AmmeterSettingActivity extends Activity implements View.OnClickList
 
                         }
                         break;
-                    case R.id.next:
 
-                        break;
                 }
             }
         };
@@ -313,6 +311,10 @@ public class AmmeterSettingActivity extends Activity implements View.OnClickList
                         DialogUIUtils.dismiss(dialog1);
                     }
                 });
+                break;
+            case R.id.next:
+                Intent intent1=new Intent(AmmeterSettingActivity.this,SettingLoadingActivity.class);
+                startActivity(intent1);
                 break;
         }
     }
