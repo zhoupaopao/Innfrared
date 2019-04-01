@@ -39,25 +39,43 @@
         android:layout_below="@id/rl1"
         android:orientation="vertical">
         <TextView
+            android:id="@+id/tv_pp_db"
             android:layout_width="wrap_content"
             android:layout_height="@dimen/x25"
-            android:text="@string/pp_db"/>
-
+            android:text="@string/pp_db"
+            android:visibility="gone"/>
+        <TextView
+            android:id="@+id/tv_add_db"
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/x25"
+            android:text="@string/add_db"/>
         <RelativeLayout
+            android:id="@+id/rl2"
             android:layout_width="match_parent"
             android:layout_height="@dimen/x25">
             <TextView
+                android:id="@+id/tv_db_num1"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:visibility="gone"
                 android:text="12312123123312"/>
+            <EditText
+                android:id="@+id/et_db1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@null"
+                android:inputType="number"
+                android:textSize="@dimen/x16"
+                android:hint="请输入电表编号"/>
             <ImageView
-                android:id="@+id/more"
+                android:id="@+id/more1"
                 android:layout_width="@dimen/x18"
                 android:layout_height="@dimen/x18"
                 android:layout_alignParentRight="true"
                 android:src="@mipmap/more"
                 />
             <ImageView
+                android:id="@+id/review1"
                 android:layout_width="@dimen/x20"
                 android:layout_height="@dimen/x20"
                 android:layout_alignParentRight="true"
@@ -65,59 +83,71 @@
                 android:visibility="gone"
                 />
             <ImageView
-                android:id="@+id/add"
+                android:id="@+id/add1"
                 android:layout_width="@dimen/x18"
                 android:layout_height="@dimen/x18"
-                android:layout_toLeftOf="@id/more"
+                android:layout_toLeftOf="@id/more1"
                 android:layout_marginRight="@dimen/x12"
                 android:src="@mipmap/add"
                 />
 
         </RelativeLayout>
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="@dimen/x25"
-            android:text="@string/add_db"/>
-
-        <RelativeLayout
+        <LinearLayout
+            android:id="@+id/ll2"
             android:layout_width="match_parent"
-            android:layout_height="@dimen/x25">
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
             <TextView
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="12312123123312"
-                android:visibility="gone"/>
-            <EditText
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="@null"
-                android:hint="请输入电表编号"/>
-            <ImageView
-                android:id="@+id/more2"
-                android:layout_width="@dimen/x18"
-                android:layout_height="@dimen/x18"
-                android:layout_alignParentRight="true"
-                android:src="@mipmap/more"
-                android:visibility="gone"
-                />
-            <ImageView
-                android:id="@+id/review2"
-                android:layout_width="@dimen/x20"
-                android:layout_height="@dimen/x20"
-                android:layout_alignParentRight="true"
-                android:src="@mipmap/review"
+                android:layout_height="@dimen/x25"
+                android:text="@string/add_db"/>
 
-                />
-            <ImageView
-                android:id="@+id/delete2"
-                android:layout_width="@dimen/x18"
-                android:layout_height="@dimen/x18"
-                android:layout_toLeftOf="@id/review2"
-                android:layout_marginRight="@dimen/x12"
-                android:src="@mipmap/delete"
-                />
+            <RelativeLayout
+                android:id="@+id/rl3"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/x25">
+                <TextView
+                    android:id="@+id/tv_db_num2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="12312123123312"
+                    android:visibility="gone"/>
+                <EditText
+                    android:id="@+id/et_db2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@null"
+                    android:textSize="@dimen/x16"
+                    android:inputType="number"
+                    android:hint="请输入电表编号"/>
+                <ImageView
+                    android:id="@+id/more2"
+                    android:layout_width="@dimen/x18"
+                    android:layout_height="@dimen/x18"
+                    android:layout_alignParentRight="true"
+                    android:src="@mipmap/more"
+                    android:visibility="gone"
+                    />
+                <ImageView
+                    android:id="@+id/review2"
+                    android:layout_width="@dimen/x18"
+                    android:layout_height="@dimen/x18"
+                    android:layout_alignParentRight="true"
+                    android:src="@mipmap/review"
 
-        </RelativeLayout>
+                    />
+                <ImageView
+                    android:id="@+id/delete2"
+                    android:layout_width="@dimen/x18"
+                    android:layout_height="@dimen/x18"
+                    android:layout_toLeftOf="@id/review2"
+                    android:layout_marginRight="@dimen/x12"
+                    android:src="@mipmap/delete"
+                    />
+
+            </RelativeLayout>
+        </LinearLayout>
+
     </LinearLayout>
     <Button
         android:id="@+id/next"

@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout android:layout_width="wrap_content"
+    android:layout_height="120dp"
+    android:orientation="vertical"
+    android:background="@mipmap/bg_pop"
+    android:padding="@dimen/x18"
+    xmlns:android="http://schemas.android.com/apk/res/android" >
+
+        <LinearLayout
+            android:id="@+id/rl1"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/x30"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+            <ImageView
+                android:layout_width="@dimen/x20"
+                android:layout_height="@dimen/x20"
+                android:src="@mipmap/edit"
+                />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="@dimen/x25"
+                android:layout_marginLeft="@dimen/x14"
+                android:gravity="center_vertical"
+                android:text="@string/edit_db"/>
+        </LinearLayout>
+        <LinearLayout
+            android:id="@+id/rl2"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/x30"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+            <ImageView
+                android:layout_width="@dimen/x20"
+                android:layout_height="@dimen/x20"
+                android:src="@mipmap/delete_db"
+                />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="@dimen/x25"
+                android:layout_marginLeft="@dimen/x14"
+                android:gravity="center_vertical"
+                android:text="@string/delete_db"/>
+        </LinearLayout>
+        <LinearLayout
+            android:id="@+id/rl3"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/x30"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+            <ImageView
+                android:layout_width="@dimen/x20"
+                android:layout_height="@dimen/x20"
+                android:src="@mipmap/look_db"
+                />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="@dimen/x25"
+                android:layout_marginLeft="@dimen/x14"
+                android:gravity="center_vertical"
+                android:text="@string/look_db"/>
+        </LinearLayout>
+
+</LinearLayout>

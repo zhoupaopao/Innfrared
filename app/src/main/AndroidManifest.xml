@@ -39,6 +39,8 @@
         <activity android:name="com.example.innfrared.SettingPage.FastSettingActivity8"/>
         <activity android:name="com.example.innfrared.InputXlhActivity"/>
         <activity android:name="com.example.innfrared.AmmeterSettingActivity"/>
+        <activity android:name=".LookDataActivity"/>
+        <activity android:name=".SettingLoadingActivity" />
     </application>
 
 </manifest>

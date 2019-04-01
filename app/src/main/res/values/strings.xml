@@ -13,6 +13,11 @@
     <string name="now_sn">当前采集器SN</string>
     <string name="pp_db">已匹配电表</string>
     <string name="add_db">添加电表</string>
+    <string name="edit_db">编辑电表</string>
+    <string name="delete_db">删除电表</string>
+    <string name="sure_delete">确定删除</string>
+    <string name="sure_delete_db">确定要删除设备吗?</string>
+    <string name="look_db">查看数据</string>
     <string name="first_step">第一步、检查红外接口</string>
     <string name="second_step">第二步、安装位置确认</string>
     <string name="third_step">第三步、接线方案</string>
@@ -32,4 +37,8 @@
     <string name="next_sure7">下一步 确认通信成功</string>
     <string name="next_sure8">开始电表配置</string>
     <string name="sure">确认</string>
+    <string name="back">返回</string>
+    <string name="setting_fail">配置未完成</string>
+    <string name="setting_db">配置电表</string>
+    <string name="five_loading">数据约5分钟后上传,请耐心等待</string>
 </resources>
