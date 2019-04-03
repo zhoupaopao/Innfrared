@@ -28,12 +28,19 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.dou361.dialogui.DialogUIUtils;
+import com.dou361.dialogui.bean.BuildBean;
 import com.dou361.dialogui.listener.DialogUIListener;
 
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+
+import cn.finalteam.okhttpfinal.HttpRequest;
+import cn.finalteam.okhttpfinal.JsonHttpRequestCallback;
+import okhttp3.Headers;
 
 /**
  * Created by Lenovo on 2019/3/29.
@@ -76,6 +83,10 @@ public class AmmeterSettingActivity extends Activity implements View.OnClickList
     private String need_updata1="";//最终上传的数据1
     private String need_updata2="";//最终上传的数据2
     private Boolean cannext=false;//能否下一步
+    private BuildBean dialog;
+    private Boolean rem;
+//    private String db_num1="";
+//    private String db_num2="";
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -91,6 +102,7 @@ public class AmmeterSettingActivity extends Activity implements View.OnClickList
     private void initView() {
         mActivity=this;
         SN=getIntent().getStringExtra("SN");
+        rem=getIntent().getBooleanExtra("rem",false);
         sp=getSharedPreferences("Infrared",MODE_PRIVATE);
         DialogUIUtils.init(getApplicationContext());
         back=findViewById(R.id.back);
@@ -118,7 +130,48 @@ public class AmmeterSettingActivity extends Activity implements View.OnClickList
     }
 
     private void initData() {
-
+        if(rem){
+            cannext=true;
+            next.setBackgroundResource(R.drawable.btn_blue);
+            //读取数据
+            String db_list=sp.getString("db_list","");
+            Log.i("initData: ", db_list);
+            String[]dsa=db_list.split(",");
+            if(dsa.length==2){
+//                db_num1=dsa[0];
+//                db_num2=dsa[1];
+                need_updata1=dsa[0];
+                need_updata2=dsa[1];
+            }else{
+//                db_num1=dsa[0];
+                need_updata1=dsa[0];
+            }
+            //更改布局
+            tv_add_db.setText("已匹配电表");
+            et_db1.setVisibility(View.GONE);
+            tv_db_num1.setText(need_updata1);
+            tv_db_num1.setVisibility(View.VISIBLE);
+            review1.setImageResource(R.mipmap.more);
+            more1.setVisibility(View.GONE);
+            str_review1="2";
+            if(need_updata2.equals("")){
+                //隐藏布局2，显示添加按钮
+                more1.setVisibility(View.VISIBLE);
+                more1.setImageResource(R.mipmap.add);
+                ll2.setVisibility(View.GONE);
+            }else{
+                //显示布局2，
+                str_review2="2";
+                et_db2.setVisibility(View.GONE);
+                tv_db_num2.setText(need_updata2);
+                tv_db_num2.setVisibility(View.VISIBLE);
+                review2.setImageResource(R.mipmap.more);
+                more2.setVisibility(View.GONE);
+                delete2.setVisibility(View.GONE);
+                tv_add_db2.setVisibility(View.GONE);
+                ll2.setVisibility(View.VISIBLE);
+            }
+        }
     }
 
     private void initListener() {
@@ -486,6 +539,7 @@ public class AmmeterSettingActivity extends Activity implements View.OnClickList
                 //之后这个界面就不需要来了
                 //判断是否有数据
                 if(cannext){
+                    //请求数据，将SN号上传，获取电表deviceid
                     Intent intent1=new Intent(AmmeterSettingActivity.this,SettingLoadingActivity.class);
                     SimpleDateFormat sdf=new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
                     String date=sdf.format(new java.util.Date());
@@ -502,6 +556,47 @@ public class AmmeterSettingActivity extends Activity implements View.OnClickList
                     editor.commit();
                     startActivity(intent1);
                     finish();
+                    //不需要请求这个接口
+                    //最后才获取
+//                    SN="1415094552";
+//                    Log.i("onSuccess", Api.getAmmetersByDatalogerSn +SN);
+//                    HttpRequest.get(Api.getAmmetersByDatalogerSn +SN, new JsonHttpRequestCallback() {
+//                        @Override
+//                        protected void onSuccess(Headers headers, JSONObject jsonObject) {
+//                            super.onSuccess(headers, jsonObject);
+//                            Log.i("onSuccess", jsonObject.toString());
+//
+//                            dialog.dialog.dismiss();
+//                            if (jsonObject.getString("result").equals("1")) {
+//                                //符合结果
+//                                //符合的可以不在扫描了，当然你想继续扫描也是可以的
+//                                //判断是不是本地记录的那个sn
+//
+//                            }
+//                        }
+//                            @Override
+//                            public void onStart () {
+//                                super.onStart();
+//                                dialog = DialogUIUtils.showLoading(AmmeterSettingActivity.this, "请求中...", true, true, false, true);
+//                                dialog.show();
+//                            }
+//                            @Override
+//                            public void onFailure ( int errorCode, String msg){
+//                                super.onFailure(errorCode, msg);
+////                                Toast.makeText(AmmeterSettingActivity.this,"采集器下没有电表",Toast.LENGTH_SHORT).show();
+//                                dialog.dialog.dismiss();
+//                            }
+//
+//                        @Override
+//                        public void onResponse(String response, Headers headers) {
+//                            super.onResponse(response, headers);
+//                            Log.i("onClick2: ", response);
+//                            JSONArray jsonArray=JSONArray.parseArray(response);
+//                            String sadas=jsonArray.getJSONObject(1).getString("sn");
+//                            Log.i("onClick2: ", sadas);
+//                            dialog.dialog.dismiss();
+//                        }
+//                    });
                 }else{
 
                 }

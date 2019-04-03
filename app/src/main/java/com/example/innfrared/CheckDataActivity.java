@@ -3,16 +3,27 @@ package com.example.innfrared;
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.dou361.dialogui.DialogUIUtils;
+import com.dou361.dialogui.bean.BuildBean;
+
+import cn.finalteam.okhttpfinal.HttpRequest;
+import cn.finalteam.okhttpfinal.JsonHttpRequestCallback;
+import okhttp3.Headers;
 
 /**
  * Created by Lenovo on 2019/4/1.
@@ -24,7 +35,21 @@ public class CheckDataActivity extends Activity {
     private TextView title;
     private ImageView back;
     private ImageView review;
-
+    private SharedPreferences sp;
+    private String need_updata1;
+    private String need_updata2;
+    private TextView tv_db1;
+    private TextView tv_db2;
+    private TextView zxygdn1;
+    private TextView zxygdn2;
+    private TextView fxygdn1;
+    private TextView fxygdn2;
+    private LinearLayout ll1;
+    private LinearLayout ll2;
+    private String device_list="";
+    private BuildBean dialog;
+    private String deviceId1="";
+    private String deviceId2="";
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -41,11 +66,91 @@ public class CheckDataActivity extends Activity {
         title=findViewById(R.id.tv_title);
         back=findViewById(R.id.back);
         review=findViewById(R.id.review);
+        tv_db1=findViewById(R.id.tv_db1);
+        tv_db2=findViewById(R.id.tv_db2);
+        zxygdn1=findViewById(R.id.zxygdn1);
+        zxygdn2=findViewById(R.id.zxygdn2);;
+        fxygdn1=findViewById(R.id.fxygdn1);;
+        fxygdn2=findViewById(R.id.fxygdn2);;
+        ll1=findViewById(R.id.ll1);
+        ll2=findViewById(R.id.ll2);
+        sp=getSharedPreferences("Infrared",MODE_PRIVATE);
+        device_list=getIntent().getStringExtra("device_list");
     }
 
     private void initData() {
+        device_list=getIntent().getStringExtra("device_list");
         title.setText("数据验证");
+        String db_list=sp.getString("db_list","");
+        Log.i("initData: ", device_list);
+        String[]dsa=db_list.split(",");
+        String[]lists_dev=device_list.split(",");
+        if(dsa.length==2){
+            need_updata1=dsa[0];
+            need_updata2=dsa[1];
+            ll2.setVisibility(View.VISIBLE);
+            tv_db1.setText("正在从电表"+need_updata1+"读取数据");
+            tv_db2.setText("正在从电表"+need_updata2+"读取数据");
+            deviceId1=lists_dev[0];
+            deviceId2=lists_dev[1];
+            achieveData(deviceId1);
+            achieveData(deviceId2);
+        }else{
+            need_updata1=dsa[0];
+            tv_db1.setText("正在从电表"+need_updata1+"读取数据");
+            deviceId1=lists_dev[0];
+            achieveData(deviceId1);
+            ll2.setVisibility(View.GONE);
+        }
+        //请求数据
 
+    }
+    private  void achieveData(String deviceId){
+
+        HttpRequest.get(Api.doDetail +deviceId, new JsonHttpRequestCallback() {
+            @Override
+            protected void onSuccess(Headers headers, JSONObject jsonObject) {
+                super.onSuccess(headers, jsonObject);
+                Log.i("onSuccess", jsonObject.toString());
+
+                dialog.dialog.dismiss();
+
+            }
+            @Override
+            public void onStart () {
+                super.onStart();
+                dialog = DialogUIUtils.showLoading(CheckDataActivity.this, "请求中...", true, true, false, true);
+                dialog.show();
+            }
+            @Override
+            public void onFailure ( int errorCode, String msg){
+                super.onFailure(errorCode, msg);
+//                                Toast.makeText(AmmeterSettingActivity.this,"采集器下没有电表",Toast.LENGTH_SHORT).show();
+                dialog.dialog.dismiss();
+            }
+
+            @Override
+            public void onResponse(String response, Headers headers) {
+                super.onResponse(response, headers);
+                Log.i("onClick2: ", response);
+                JSONObject jsonArrayyy= (JSONObject) JSONObject.parse(response);
+
+                JSONArray realTimeDataTotal=jsonArrayyy.getJSONObject("DeviceWapper").getJSONArray("realTimeDataTotal");
+                Log.i("onClick2: ", realTimeDataTotal.toString());
+                for(int i=0;i<realTimeDataTotal.size();i++){
+                    JSONObject json=realTimeDataTotal.getJSONObject(i);
+                    String keyy=realTimeDataTotal.getJSONObject(i).getString("key");
+
+                    if(keyy.equals("1bk")){
+                        zxygdn1.setText(realTimeDataTotal.getJSONObject(i).getString("value")+"kWh");
+                    }
+                    if(keyy.equals("1bp")){
+                        fxygdn1.setText(realTimeDataTotal.getJSONObject(i).getString("value")+"kWh");
+                    }
+                }
+
+            }
+        });
     }
 
     private void initListener() {

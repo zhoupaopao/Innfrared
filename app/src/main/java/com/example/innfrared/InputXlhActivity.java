@@ -21,8 +21,18 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.alibaba.fastjson.JSONObject;
+import com.dou361.dialogui.DialogUIUtils;
+import com.dou361.dialogui.bean.BuildBean;
+
 import java.text.SimpleDateFormat;
 import java.util.Date;
+
+import cn.finalteam.okhttpfinal.HttpRequest;
+import cn.finalteam.okhttpfinal.JsonHttpRequestCallback;
+import cn.finalteam.okhttpfinal.RequestParams;
+import okhttp3.Headers;
+import okhttp3.MediaType;
 
 /**
  * Created by Lenovo on 2019/3/28.
@@ -38,6 +48,7 @@ public class InputXlhActivity extends Activity {
     private Button sure;
     private EditText et_xlh;
     private SharedPreferences sp;
+    private BuildBean dialog;
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -83,40 +94,85 @@ public class InputXlhActivity extends Activity {
 //                intent.putExtra("SN",et_xlh.getText().toString().trim());
 //                setResult(1,intent);
 //                finish();
-                String lastSn=sp.getString("SN","");
-                Log.i("barcodeResult: ", et_xlh.getText()+"|"+lastSn);
-                if(et_xlh.getText().toString().equals(lastSn)){
-                    //和本地最后记录的相同
-                    //查看时间差
-                    Log.e(getClass().getName(), "213");
-                    SimpleDateFormat sdf=new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
-                    String date=sdf.format(new java.util.Date());
-                    String lasttime=sp.getString("lastesttime","");
-                    //时间差（秒）
-                    long longexpand=getTimeExpend(lasttime,date);
-                    if(longexpand>300){
-                        //要么进入配置错误，要么进入配置成功
-                        Intent intent=new Intent(InputXlhActivity.this,SettingFinishSuccessActivity.class);
-                        startActivity(intent);
+                doDataloggerCheck(et_xlh.getText().toString());
+
+            }
+        });
+    }
+    public void doDataloggerCheck(final String re_SN){
+        RequestParams params = new RequestParams();
+        params.addHeader("Content-Type", "application/json");
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("sn", re_SN);
+        params.setRequestBody(MediaType.parse("application/json"), jsonObject.toString());
+        Log.i("onSuccess", Api.doDataloggerCheck +"sn="+re_SN);
+        HttpRequest.get(Api.doDataloggerCheck +"sn="+re_SN, new JsonHttpRequestCallback() {
+            @Override
+            protected void onSuccess(Headers headers, JSONObject jsonObject) {
+                super.onSuccess(headers, jsonObject);
+                Log.i("onSuccess", jsonObject.toString());
+
+                dialog.dialog.dismiss();
+                if(jsonObject.getString("result").equals("1")){
+                    //符合结果
+                    //符合的可以不在扫描了，当然你想继续扫描也是可以的
+                    //判断是不是本地记录的那个sn
+                    String lastSn=sp.getString("SN","");
+                    Log.i("barcodeResult: ", et_xlh.getText()+"|"+lastSn);
+                    if(et_xlh.getText().toString().equals(lastSn)){
+                        //和本地最后记录的相同
+                        //查看时间差
+                        Log.e(getClass().getName(), "213");
+                        SimpleDateFormat sdf=new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+                        String date=sdf.format(new java.util.Date());
+                        String lasttime=sp.getString("lastesttime","");
+                        //时间差（秒）
+                        long longexpand=getTimeExpend(lasttime,date);
+                        if(longexpand>300){
+                            //要么进入配置错误，要么进入配置成功
+                            Intent intent=new Intent(InputXlhActivity.this,SettingFinishSuccessActivity.class);
+                            startActivity(intent);
+                        }else{
+                            //进入等待
+                            Intent intent1=new Intent(InputXlhActivity.this,SettingLoadingActivity.class);
+                            intent1.putExtra("longexpand",longexpand);
+                            startActivity(intent1);
+                        }
                     }else{
-                        //进入等待
-                        Intent intent1=new Intent(InputXlhActivity.this,SettingLoadingActivity.class);
-                        intent1.putExtra("longexpand",longexpand);
-                        startActivity(intent1);
+                        SharedPreferences.Editor editor=sp.edit();
+                        editor.putString("SN","");
+                        editor.putString("db_list","");
+                        editor.putString("lastesttime","");
+                        editor.commit();
+                        Log.i("onClick: ", et_xlh.getText().toString());
+                        Intent intent2=new Intent();
+                        intent2.putExtra("SN",et_xlh.getText().toString());
+                        intent2.setClass(InputXlhActivity.this,AmmeterSettingActivity.class);
+                        startActivity(intent2);
+
                     }
+                    finish();
                 }else{
+                    //没有这个，重新扫描
                     SharedPreferences.Editor editor=sp.edit();
                     editor.putString("SN","");
                     editor.putString("db_list","");
                     editor.putString("lastesttime","");
                     editor.commit();
-                    Log.i("onClick: ", et_xlh.getText().toString());
-                    Intent intent2=new Intent();
-                    intent2.putExtra("SN",et_xlh.getText().toString());
-                    intent2.setClass(InputXlhActivity.this,AmmeterSettingActivity.class);
-                    startActivity(intent2);
-                    finish();
+                    Toast.makeText(InputXlhActivity.this,"该采集器不符合要求",Toast.LENGTH_SHORT).show();
                 }
+            }
+
+            @Override
+            public void onStart() {
+                super.onStart();
+                dialog = DialogUIUtils.showLoading(InputXlhActivity.this, "验证中...", true, true, false, true);
+                dialog.show();
+            }
+
+            @Override
+            public void onFailure(int errorCode, String msg) {
+                super.onFailure(errorCode, msg);
             }
         });
     }

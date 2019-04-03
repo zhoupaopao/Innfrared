@@ -20,12 +20,18 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+
+import com.alibaba.fastjson.JSONObject;
+import com.dou361.dialogui.DialogUIUtils;
+import com.dou361.dialogui.bean.BuildBean;
 import com.google.zxing.ResultPoint;
 import com.gyf.barlibrary.ImmersionBar;
 import com.journeyapps.barcodescanner.BarcodeCallback;
 import com.journeyapps.barcodescanner.BarcodeResult;
 import com.journeyapps.barcodescanner.CaptureManager;
 import com.journeyapps.barcodescanner.DecoratedBarcodeView;
+
+
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
@@ -34,6 +40,12 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+
+import cn.finalteam.okhttpfinal.HttpRequest;
+import cn.finalteam.okhttpfinal.JsonHttpRequestCallback;
+import cn.finalteam.okhttpfinal.RequestParams;
+import okhttp3.Headers;
+import okhttp3.MediaType;
 
 /**
  * Created by Lenovo on 2019/3/25.
@@ -57,6 +69,7 @@ public class ScanQRCodeActivity extends Activity {
     private RelativeLayout rl2;
     private ImageView sdt;
     private SharedPreferences sp;
+    private BuildBean dialog;
     private BarcodeCallback barcodeCallback = new BarcodeCallback() {
         @Override
         public void barcodeResult(BarcodeResult result) {
@@ -66,40 +79,7 @@ public class ScanQRCodeActivity extends Activity {
                 Toast.makeText(ScanQRCodeActivity.this,"获取到的扫描结果是：" + result.getText(),Toast.LENGTH_SHORT).show();
 //可以对result进行一些判断，比如说扫描结果不符合就再进行一次扫描
 //                if (result.getText().contains("符合我的结果")){
-                    //符合的可以不在扫描了，当然你想继续扫描也是可以的
-                    //判断是不是本地记录的那个sn
-                    String lastSn=sp.getString("SN","");
-                Log.i("barcodeResult: ", result.getText()+"|"+lastSn);
-                    if(result.getText().equals(lastSn)){
-                        //和本地最后记录的相同
-                        //查看时间差
-                        Log.e(getClass().getName(), "213");
-                        SimpleDateFormat sdf=new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
-                        String date=sdf.format(new java.util.Date());
-                        String lasttime=sp.getString("lastesttime","");
-                        //时间差（秒）
-                        long longexpand=getTimeExpend(lasttime,date);
-                        if(longexpand>300){
-                            //要么进入配置错误，要么进入配置成功
-                            Intent intent=new Intent(ScanQRCodeActivity.this,SettingFinishSuccessActivity.class);
-                            startActivity(intent);
-                        }else{
-                            //进入等待
-                            Intent intent1=new Intent(ScanQRCodeActivity.this,SettingLoadingActivity.class);
-                            intent1.putExtra("longexpand",longexpand);
-                            startActivity(intent1);
-                        }
-                    }else{
-                        SharedPreferences.Editor editor=sp.edit();
-                        editor.putString("SN","");
-                        editor.putString("db_list","");
-                        editor.putString("lastesttime","");
-                        editor.commit();
-                        Intent intent2=new Intent();
-                        intent2.putExtra("SN",result.getText());
-                        intent2.setClass(ScanQRCodeActivity.this,AmmeterSettingActivity.class);
-                        startActivity(intent2);
-                    }
+                doDataloggerCheck(result.getText());
 
 //                    Intent intent=new Intent();
 //                    intent.setClass(ScanQRCodeActivity.this,StartSettingActivity.class);
@@ -130,14 +110,90 @@ public class ScanQRCodeActivity extends Activity {
 
 
     }
+    public void doDataloggerCheck(final String re_SN){
+        RequestParams params = new RequestParams();
+        params.addHeader("Content-Type", "application/json");
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("sn", re_SN);
+        params.setRequestBody(MediaType.parse("application/json"), jsonObject.toString());
+        Log.i("onSuccess", Api.doDataloggerCheck +"sn="+re_SN);
+        HttpRequest.get(Api.doDataloggerCheck +"sn="+re_SN, new JsonHttpRequestCallback() {
+            @Override
+            protected void onSuccess(Headers headers, JSONObject jsonObject) {
+                super.onSuccess(headers, jsonObject);
+                Log.i("onSuccess", jsonObject.toString());
+
+                dialog.dialog.dismiss();
+                if(jsonObject.getString("result").equals("1")){
+                    //符合结果
+                    //符合的可以不在扫描了，当然你想继续扫描也是可以的
+                    //判断是不是本地记录的那个sn
+                    String lastSn=sp.getString("SN","");
+                    Log.i("barcodeResult: ", re_SN+"|"+lastSn);
+                    if(re_SN.equals(lastSn)){
+                        //和本地最后记录的相同
+                        //查看时间差
+//                        Log.e(getClass().getName(), "213");
+//                        SimpleDateFormat sdf=new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+//                        String date=sdf.format(new java.util.Date());
+//                        String lasttime=sp.getString("lastesttime","");
+//                        //时间差（秒）
+//                        long longexpand=getTimeExpend(lasttime,date);
+//                        if(longexpand>300){
+//                            //要么进入配置错误，要么进入配置成功
+//                            Intent intent=new Intent(ScanQRCodeActivity.this,SettingFinishSuccessActivity.class);
+//                            startActivity(intent);
+//                        }else{
+//                            //进入等待
+//                            Intent intent1=new Intent(ScanQRCodeActivity.this,SettingLoadingActivity.class);
+//                            intent1.putExtra("longexpand",longexpand);
+//                            startActivity(intent1);
+//                        }
+
+                        //不比较时间，进入添加电表页面
+                        Intent intent2=new Intent();
+                        intent2.putExtra("SN",re_SN);
+                        intent2.putExtra("rem",true);//是读取内存
+                        intent2.setClass(ScanQRCodeActivity.this,AmmeterSettingActivity.class);
+                        startActivity(intent2);
+                    }else{
+                        SharedPreferences.Editor editor=sp.edit();
+                        editor.putString("SN","");
+                        editor.putString("db_list","");
+                        editor.putString("lastesttime","");
+                        editor.commit();
+                        Intent intent2=new Intent();
+                        intent2.putExtra("SN",re_SN);
+                        intent2.putExtra("rem",false);//是读取内存
+                        intent2.setClass(ScanQRCodeActivity.this,AmmeterSettingActivity.class);
+                        startActivity(intent2);
+                    }
+                }else{
+                    //没有这个，重新扫描
+                    Toast.makeText(ScanQRCodeActivity.this,"该采集器不符合要求",Toast.LENGTH_SHORT).show();
+                    bv_barcode.resume();
+                }
+            }
+
+            @Override
+            public void onStart() {
+                super.onStart();
+                dialog = DialogUIUtils.showLoading(ScanQRCodeActivity.this, "验证中...", true, true, false, true);
+                dialog.show();
+            }
+
+            @Override
+            public void onFailure(int errorCode, String msg) {
+                super.onFailure(errorCode, msg);
+            }
+        });
+    }
     private long getTimeExpend(String startTime, String endTime){
         //传入字串类型 2016/06/28 08:30
         long longStart = getTimeMillis(startTime); //获取开始时间毫秒数
         long longEnd = getTimeMillis(endTime);  //获取结束时间毫秒数
         long longExpend = longEnd - longStart;  //获取时间差
         long longsecond=longExpend/1000;
-
-
         return longsecond;
     }
     private long getTimeMillis(String strTime) {
