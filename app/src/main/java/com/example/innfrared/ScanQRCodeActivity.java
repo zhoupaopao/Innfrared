@@ -182,11 +182,13 @@ public class ScanQRCodeActivity extends Activity {
                 if(isOpen){
                     bv_barcode.setTorchOn();
                     isOpen=false;
-                    sdt.setImageResource(R.mipmap.sdt2);
+                    //不需要这个动态变化
+//                    sdt.setImageResource(R.mipmap.sdt2);
                 }else{
                     bv_barcode.setTorchOff(); // 关闭手电筒
                     isOpen=true;
-                    sdt.setImageResource(R.mipmap.sdt1);
+                    //不需要这个动态变化
+//                    sdt.setImageResource(R.mipmap.sdt1);
                 }
             }
         });
@@ -203,11 +205,11 @@ public class ScanQRCodeActivity extends Activity {
                 if(isOpen){
                     bv_barcode.setTorchOn();
                     isOpen=false;
-                    sdt.setImageResource(R.mipmap.sdt2);
+//                    sdt.setImageResource(R.mipmap.sdt2);
                 }else{
                     bv_barcode.setTorchOff(); // 关闭手电筒
                     isOpen=true;
-                    sdt.setImageResource(R.mipmap.sdt1);
+//                    sdt.setImageResource(R.mipmap.sdt1);
                 }
             }
         });

@@ -11,6 +11,7 @@
     <dimen name="x20">20dp</dimen>
     <dimen name="x25">25dp</dimen>
     <dimen name="x30">30dp</dimen>
+    <dimen name="x35">35dp</dimen>
     <dimen name="x40">40dp</dimen>
     <dimen name="x44">44dp</dimen>
     <dimen name="x52">52dp</dimen>

@@ -30,6 +30,7 @@
             android:layout_height="wrap_content"
             android:gravity="left"
             android:background="@null"
+            android:inputType="number"
             android:textSize="@dimen/x16"
             android:hint="重新输入电表编号"/>
     </RelativeLayout>

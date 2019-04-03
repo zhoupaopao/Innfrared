@@ -33,7 +33,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/white"
+        android:background="@drawable/bottom_line"
         android:layout_marginTop="@dimen/x14"
         android:padding="@dimen/x12"
         android:layout_below="@id/rl1"
@@ -52,9 +52,10 @@
         <RelativeLayout
             android:id="@+id/rl2"
             android:layout_width="match_parent"
-            android:layout_height="@dimen/x25">
+            android:layout_height="@dimen/x35">
             <TextView
                 android:id="@+id/tv_db_num1"
+                android:layout_centerVertical="true"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:visibility="gone"
@@ -65,31 +66,38 @@
                 android:layout_height="wrap_content"
                 android:background="@null"
                 android:inputType="number"
-                android:textSize="@dimen/x16"
+                android:textSize="@dimen/x14"
                 android:maxLength="12"
+                android:layout_centerVertical="true"
                 android:hint="请输入电表编号"/>
+            <ImageView
+                android:id="@+id/review1"
+                android:layout_width="@dimen/x18"
+                android:layout_height="@dimen/x18"
+                android:layout_centerVertical="true"
+                android:layout_alignParentRight="true"
+                android:src="@mipmap/review"
+
+                />
             <ImageView
                 android:id="@+id/more1"
                 android:layout_width="@dimen/x18"
                 android:layout_height="@dimen/x18"
-                android:layout_alignParentRight="true"
-                android:src="@mipmap/more"
+                android:layout_toLeftOf="@id/review1"
+                android:layout_centerVertical="true"
+                android:layout_marginRight="@dimen/x12"
+                android:src="@mipmap/icon_sure"
                 />
-            <ImageView
-                android:id="@+id/review1"
-                android:layout_width="@dimen/x20"
-                android:layout_height="@dimen/x20"
-                android:layout_alignParentRight="true"
-                android:src="@mipmap/review"
-                android:visibility="gone"
-                />
+
             <ImageView
                 android:id="@+id/add1"
                 android:layout_width="@dimen/x18"
                 android:layout_height="@dimen/x18"
                 android:layout_toLeftOf="@id/more1"
                 android:layout_marginRight="@dimen/x12"
+                android:layout_centerVertical="true"
                 android:src="@mipmap/add"
+                android:visibility="gone"
                 />
 
         </RelativeLayout>
@@ -97,8 +105,11 @@
             android:id="@+id/ll2"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:visibility="gone">
             <TextView
+                android:id="@+id/tv_add_db2"
+                android:layout_marginTop="@dimen/x18"
                 android:layout_width="wrap_content"
                 android:layout_height="@dimen/x25"
                 android:text="@string/add_db"/>
@@ -106,11 +117,12 @@
             <RelativeLayout
                 android:id="@+id/rl3"
                 android:layout_width="match_parent"
-                android:layout_height="@dimen/x25">
+                android:layout_height="@dimen/x35">
                 <TextView
                     android:id="@+id/tv_db_num2"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
                     android:text="12312123123312"
                     android:visibility="gone"/>
                 <EditText
@@ -118,23 +130,18 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:background="@null"
-                    android:textSize="@dimen/x16"
+                    android:textSize="@dimen/x14"
                     android:inputType="number"
+                    android:layout_centerVertical="true"
                     android:maxLength="12"
                     android:hint="请输入电表编号"/>
-                <ImageView
-                    android:id="@+id/more2"
-                    android:layout_width="@dimen/x18"
-                    android:layout_height="@dimen/x18"
-                    android:layout_alignParentRight="true"
-                    android:src="@mipmap/more"
-                    android:visibility="gone"
-                    />
+
                 <ImageView
                     android:id="@+id/review2"
                     android:layout_width="@dimen/x18"
                     android:layout_height="@dimen/x18"
                     android:layout_alignParentRight="true"
+                    android:layout_centerVertical="true"
                     android:src="@mipmap/review"
 
                     />
@@ -144,9 +151,19 @@
                     android:layout_height="@dimen/x18"
                     android:layout_toLeftOf="@id/review2"
                     android:layout_marginRight="@dimen/x12"
+                    android:layout_centerVertical="true"
                     android:src="@mipmap/delete"
                     />
-
+                <ImageView
+                    android:id="@+id/more2"
+                    android:layout_width="@dimen/x18"
+                    android:layout_height="@dimen/x18"
+                    android:layout_centerVertical="true"
+                    android:layout_toLeftOf="@id/delete2"
+                    android:src="@mipmap/icon_sure"
+                    android:layout_marginRight="@dimen/x12"
+                    android:visibility="visible"
+                    />
             </RelativeLayout>
         </LinearLayout>
 
@@ -157,7 +174,8 @@
         android:layout_height="@dimen/x42"
         android:layout_alignParentBottom="true"
         android:layout_margin="@dimen/x25"
-        android:background="@drawable/btn_blue"
+        android:background="@drawable/btn_blue_dark"
         android:text="@string/sure"
+        android:clickable="false"
         android:textColor="@color/white" />
 </RelativeLayout>

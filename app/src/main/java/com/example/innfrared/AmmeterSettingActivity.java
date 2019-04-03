@@ -18,6 +18,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -66,6 +67,15 @@ public class AmmeterSettingActivity extends Activity implements View.OnClickList
     private Button next;
     private SharedPreferences sp;
     private String SN;
+    //给三个按钮设置属性
+    private String str_review1="1";//1代表添加的时候2代表已匹配
+    private String str_review2="1";//1代表添加的时候2代表已匹配
+    private String str_more1="1";
+    private String str_add1="1";
+    private TextView tv_add_db2;
+    private String need_updata1="";//最终上传的数据1
+    private String need_updata2="";//最终上传的数据2
+    private Boolean cannext=false;//能否下一步
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -97,12 +107,14 @@ public class AmmeterSettingActivity extends Activity implements View.OnClickList
         et_db2=findViewById(R.id.et_db2);
           review1=findViewById(R.id.review1);
           add1=findViewById(R.id.add1);
+          add1.setVisibility(View.GONE);
           more2=findViewById(R.id.more2);
           delete2=findViewById(R.id.delete2);
           ll2=findViewById(R.id.ll2);
           rl2=findViewById(R.id.rl2);
           rl3=findViewById(R.id.rl3);
         next=findViewById(R.id.next);
+        tv_add_db2=findViewById(R.id.tv_add_db2);
     }
 
     private void initData() {
@@ -114,10 +126,13 @@ public class AmmeterSettingActivity extends Activity implements View.OnClickList
         now_sn.setText("当前采集器SN   "+SN);
         sys.setOnClickListener(this);
         back.setOnClickListener(this);
+        review1.setOnClickListener(this);
         review2.setOnClickListener(this);
         more1.setOnClickListener(this);
         next.setOnClickListener(this);
         add1.setOnClickListener(this);
+        delete2.setOnClickListener(this);
+        more2.setOnClickListener(this);
     }
     private View getPopupWindowContentView() {
         // 一个自定义的布局，作为显示的内容
@@ -133,7 +148,7 @@ public class AmmeterSettingActivity extends Activity implements View.OnClickList
                 switch (((LinearLayout) v).getId()){
                     case R.id.rl1:
                         //编辑电表
-                        View edit_rootView = View.inflate(AmmeterSettingActivity.this, R.layout.dialog_db, null);
+                        final View edit_rootView = View.inflate(AmmeterSettingActivity.this, R.layout.dialog_db, null);
                         final Dialog edit_dialog = DialogUIUtils.showCustomAlert(AmmeterSettingActivity.this, edit_rootView, Gravity.CENTER, true, false).show();
                         //设置弹出框透明
                         edit_dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
@@ -142,14 +157,13 @@ public class AmmeterSettingActivity extends Activity implements View.OnClickList
                         WindowManager.LayoutParams params1 = edit_dialog.getWindow().getAttributes();
                         params1.width = (int) (d1.getWidth() * 0.8); // 宽度设置为屏幕的0.6
                         edit_dialog.getWindow().setAttributes(params1);
-
                         edit_rootView.findViewById(R.id.cancel).setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
                                 DialogUIUtils.dismiss(edit_dialog);
                             }
                         });
-
+                        @SuppressLint("WrongViewCast") final EditText ed_text1=edit_rootView.findViewById(R.id.ed_text);
                         edit_rootView.findViewById(R.id.sure).setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
@@ -157,16 +171,17 @@ public class AmmeterSettingActivity extends Activity implements View.OnClickList
                                 //执行编辑操作
                                 if(nowmoreid=="1"){
                                     //是第一组数据
-//                                    rl2.setVisibility(View.GONE);
+                                    tv_db_num1.setText(ed_text1.getText().toString());
+                                    need_updata1=ed_text1.getText().toString();
                                 }else{
-//                                    rl3.setVisibility(View.GONE);
+                                    tv_db_num2.setText(ed_text1.getText().toString());
+                                    need_updata2=ed_text1.getText().toString();
                                 }
                             }
                         });
                         break;
                     case R.id.rl2:
                         //删除电表
-
                         View delete_rootView = View.inflate(AmmeterSettingActivity.this, R.layout.dialog_db, null);
                         final Dialog delete_dialog = DialogUIUtils.showCustomAlert(AmmeterSettingActivity.this, delete_rootView, Gravity.CENTER, true, false).show();
                         //设置弹出框透明
@@ -198,9 +213,73 @@ public class AmmeterSettingActivity extends Activity implements View.OnClickList
                                 //执行删除操作
                                 if(nowmoreid=="1"){
                                     //是第一组数据
-                                    rl2.setVisibility(View.GONE);
+                                    //判断是否有两组数据
+                                    if(str_review2.equals("2")){
+                                        //有两组数据
+                                        //将第二组的数据赋值给1
+                                        //2的数据删除
+                                        need_updata1=need_updata2;
+                                        need_updata2="";
+                                        ll2.setVisibility(View.GONE);
+                                        //给1赋值2的数据
+                                        tv_db_num1.setText(tv_db_num2.getText().toString());
+                                        //先恢复2的布局
+                                        more2.setVisibility(View.VISIBLE);
+                                        more2.setImageResource(R.mipmap.icon_sure);
+                                        review2.setVisibility(View.VISIBLE);
+                                        review2.setImageResource(R.mipmap.review);
+                                        delete2.setVisibility(View.VISIBLE);
+                                        delete2.setImageResource(R.mipmap.delete);
+                                        tv_db_num2.setText("");
+                                        tv_db_num2.setVisibility(View.GONE);
+
+                                        et_db2.setText("");
+                                        et_db2.setVisibility(View.VISIBLE);
+                                        tv_add_db2.setVisibility(View.VISIBLE);
+                                        more1.setVisibility(View.VISIBLE);
+                                        more1.setImageResource(R.mipmap.add);
+                                        str_review2="1";
+                                    }else{
+                                        //一组
+                                        //如果ll2是显示的就隐藏，同时还原一组的布局
+                                        //删除数据1
+                                        need_updata1="";
+                                        tv_add_db.setText("添加电表");
+                                        tv_db_num1.setText("");
+                                        tv_db_num1.setVisibility(View.GONE);
+                                        et_db1.setText("");
+                                        et_db1.setVisibility(View.VISIBLE);
+                                        more1.setImageResource(R.mipmap.icon_sure);
+                                        more1.setVisibility(View.VISIBLE);
+                                        review1.setImageResource(R.mipmap.review);
+                                        review1.setVisibility(View.VISIBLE);
+                                        ll2.setVisibility(View.GONE);
+                                        next.setBackgroundResource(R.drawable.btn_blue_dark);
+                                        cannext=false;
+                                        str_review1="1";
+                                    }
                                 }else{
-                                    rl3.setVisibility(View.GONE);
+                                    //删除第二组数据
+                                    //有两组数据
+                                    ll2.setVisibility(View.GONE);
+                                    need_updata2="";
+                                    //给1赋值2的数据
+                                    //先恢复2的布局
+                                    more2.setVisibility(View.VISIBLE);
+                                    more2.setImageResource(R.mipmap.icon_sure);
+                                    review2.setVisibility(View.VISIBLE);
+                                    review2.setImageResource(R.mipmap.review);
+                                    delete2.setVisibility(View.VISIBLE);
+                                    delete2.setImageResource(R.mipmap.delete);
+                                    tv_db_num2.setText("");
+                                    tv_db_num2.setVisibility(View.GONE);
+                                    et_db2.setText("");
+                                    et_db2.setVisibility(View.VISIBLE);
+                                    tv_add_db2.setVisibility(View.VISIBLE);
+                                    more1.setVisibility(View.VISIBLE);
+                                    more1.setImageResource(R.mipmap.add);
+                                    str_review2="1";
+
                                 }
                             }
                         });
@@ -284,69 +363,172 @@ public class AmmeterSettingActivity extends Activity implements View.OnClickList
                 finish();
                 break;
             case R.id.review2:
-                Log.i("review2: ", "onClick: ");
-                View rootView = View.inflate(AmmeterSettingActivity.this, R.layout.pop_review, null);
-                final Dialog dialog = DialogUIUtils.showCustomAlert(this, rootView, Gravity.CENTER, true, false).show();
-                //设置弹出框透明
-                dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
-                rootView.findViewById(R.id.close).setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        DialogUIUtils.dismiss(dialog);
-                    }
-                });
+                if(str_review2.equals("1")){
+                    Log.i("review2: ", "onClick: ");
+                    View rootView = View.inflate(AmmeterSettingActivity.this, R.layout.pop_review, null);
+                    final Dialog dialog = DialogUIUtils.showCustomAlert(this, rootView, Gravity.CENTER, true, false).show();
+                    //设置弹出框透明
+                    dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+                    rootView.findViewById(R.id.close).setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            DialogUIUtils.dismiss(dialog);
+                        }
+                    });
+                }else{
+                    //已匹配
+                    nowmoreid="2";
+                    showPopupWindow(review2);
+                }
+
                 break;
             case R.id.more1:
-                nowmoreid="1";
-                showPopupWindow(more1);
+                if(str_review1.equals("2")){
+                    //已匹配
+                    ll2.setVisibility(View.VISIBLE);
+                    more1.setVisibility(View.GONE);
+                }else{
+                    //确定按钮
+                    if(et_db1.getText().toString().trim().equals("")){
+                        //没有输入
+                        DialogUIUtils.showAlert(mActivity, "提示", "请输入电表编号后点击确定", "", "", "确定", "", true, true, true, new DialogUIListener() {
+                            @Override
+                            public void onPositive() {
+                            }
+                            @Override
+                            public void onNegative() {
+                            }
+                        }).show();
+                        break;
+                    }else{
+                        //界面发生变化
+                        //头变成已匹配电表，edittext隐藏，textview显示，最后一个图标变成...，设置图标属性
+                        tv_add_db.setText("已匹配电表");
+                        need_updata1=et_db1.getText().toString();
+                        tv_db_num1.setText(et_db1.getText().toString());
+                        et_db1.setVisibility(View.GONE);
+                        et_db1.setText("");
+                        tv_db_num1.setVisibility(View.VISIBLE);
+                        more1.setImageResource(R.mipmap.add);
+                        review1.setImageResource(R.mipmap.more);
+                        str_review1="2";
+                        //将底部button变色
+                        next.setBackgroundResource(R.drawable.btn_blue);
+                        cannext=true;
+                        hidekey();
+                    }
+                }
+
                 break;
             case R.id.add1:
                 //验证一下是否超过12位
                 //模拟数据添加（自动补全12位）
-                Log.i("AmmeterSettingActivity", "onClick: ");
-                String updata1=et_db1.getText().toString();
-                DecimalFormat df=new DecimalFormat("000000000000");
-                String str2=df.format(Integer.parseInt(updata1));
-                Log.i("AmmeterSettingActivity", "onClick: "+str2);
+                String format_db1=achieve_format(et_db1.getText().toString());
+                Log.i("AmmeterSettingActivity", format_db1);
                 break;
             case R.id.more2:
-                nowmoreid="2";
-                showPopupWindow(more2);
+                //点击确认，界面变化
+
+                    //nowmoreid="1";
+                    //showPopupWindow(more1);
+                    //确定按钮
+                    if(et_db2.getText().toString().trim().equals("")){
+                        //没有输入
+                        DialogUIUtils.showAlert(mActivity, "提示", "请输入电表编号后点击确定", "", "", "确定", "", true, true, true, new DialogUIListener() {
+                            @Override
+                            public void onPositive() {
+                            }
+                            @Override
+                            public void onNegative() {
+                            }
+                        }).show();
+                        break;
+                    }else{
+                        //界面发生变化
+                        //添加电表隐藏，edittext隐藏，textview显示，最后一个图标变成...，设置图标属性
+                        tv_add_db2.setVisibility(View.GONE);
+                        need_updata2=et_db2.getText().toString();
+                        tv_db_num2.setText(et_db2.getText().toString());
+                        et_db2.setVisibility(View.GONE);
+                        et_db2.setText("");
+                        tv_db_num2.setVisibility(View.VISIBLE);
+                        delete2.setVisibility(View.GONE);
+                        more2.setVisibility(View.GONE);
+                        review2.setImageResource(R.mipmap.more);
+                        str_review2="2";
+                        hidekey();
+                    }
                 break;
             case R.id.delete2:
                 ll2.setVisibility(View.GONE);
+                more1.setVisibility(View.VISIBLE);
                 break;
             case R.id.review1:
-                Log.i("review2: ", "onClick: ");
-                View rootView1 = View.inflate(AmmeterSettingActivity.this, R.layout.pop_review, null);
-                final Dialog dialog1 = DialogUIUtils.showCustomAlert(this, rootView1, Gravity.CENTER, true, false).show();
-                //设置弹出框透明
-                dialog1.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
-                rootView1.findViewById(R.id.close).setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        DialogUIUtils.dismiss(dialog1);
-                    }
-                });
+                Log.i("review1: ", "onClick: ");
+                if(str_review1.equals("2")){
+                    nowmoreid="1";
+                    showPopupWindow(review1);
+                }else{
+                    View rootView1 = View.inflate(AmmeterSettingActivity.this, R.layout.pop_review, null);
+                    final Dialog dialog1 = DialogUIUtils.showCustomAlert(this, rootView1, Gravity.CENTER, true, false).show();
+                    //设置弹出框透明
+                    dialog1.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+                    rootView1.findViewById(R.id.close).setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            DialogUIUtils.dismiss(dialog1);
+                        }
+                    });
+                }
+
                 break;
             case R.id.next:
                 //之后这个界面就不需要来了
-                Intent intent1=new Intent(AmmeterSettingActivity.this,SettingLoadingActivity.class);
-                SimpleDateFormat sdf=new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
-                String date=sdf.format(new java.util.Date());
-                //先进行匹配
-                //匹配通过后，本地记录时间
-                SharedPreferences.Editor editor=sp.edit();
-                String db1="123";
-                String db2="456";
-                //这个地方记录SN号
-                editor.putString("SN",SN);
-                editor.putString("db_list",db1+","+db2);
-                editor.putString("lastesttime",date);
-                editor.commit();
-                startActivity(intent1);
-                finish();
+                //判断是否有数据
+                if(cannext){
+                    Intent intent1=new Intent(AmmeterSettingActivity.this,SettingLoadingActivity.class);
+                    SimpleDateFormat sdf=new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+                    String date=sdf.format(new java.util.Date());
+                    //先进行匹配
+                    //匹配通过后，本地记录时间
+                    SharedPreferences.Editor editor=sp.edit();
+                    String db1=need_updata1;
+                    String db2=need_updata2;
+                    //这个地方记录SN号
+                    Log.i("onClick: ", db1+","+db2);
+                    editor.putString("SN",SN);
+                    editor.putString("db_list",db1+","+db2);
+                    editor.putString("lastesttime",date);
+                    editor.commit();
+                    startActivity(intent1);
+                    finish();
+                }else{
+
+                }
+
                 break;
+        }
+    }
+    //自动补全12位，同时按照要求从后到前每隔2位重组
+    private String achieve_format(String updata1){
+        String las_sub="";
+        DecimalFormat df=new DecimalFormat("000000000000");
+        String str2=df.format(Integer.parseInt(updata1));
+
+        for(int i=0;i<6;i++){
+            String sub_str=str2.substring(12-i*2-2, 12-i*2);
+            las_sub=las_sub+sub_str;
+        }
+//        Log.i("AmmeterSettingActivity", "onClick: "+las_sub);
+//        Log.i("AmmeterSettingActivity", "onClick: "+str2);
+        return las_sub;
+    }
+    private void hidekey(){
+        /**隐藏软键盘**/
+        View view1 = getWindow().peekDecorView();
+        if (view1 != null) {
+            InputMethodManager inputmanger = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+            inputmanger.hideSoftInputFromWindow(view1.getWindowToken(), 0);
         }
     }
 

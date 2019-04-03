@@ -85,7 +85,7 @@ public class InputXlhActivity extends Activity {
 //                finish();
                 String lastSn=sp.getString("SN","");
                 Log.i("barcodeResult: ", et_xlh.getText()+"|"+lastSn);
-                if(et_xlh.getText().equals(lastSn)){
+                if(et_xlh.getText().toString().equals(lastSn)){
                     //和本地最后记录的相同
                     //查看时间差
                     Log.e(getClass().getName(), "213");
@@ -115,6 +115,7 @@ public class InputXlhActivity extends Activity {
                     intent2.putExtra("SN",et_xlh.getText().toString());
                     intent2.setClass(InputXlhActivity.this,AmmeterSettingActivity.class);
                     startActivity(intent2);
+                    finish();
                 }
             }
         });
