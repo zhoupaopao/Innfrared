@@ -47,4 +47,11 @@
     <string name="none_data_msg">请确认电表编号与安装位置是否准确</string>
     <string name="check_data">数据校验</string>
     <string name="know">我知道了</string>
+    <string name="pleasecheck">请务必校验正向有功总电能是否准确</string>
+    <string name="zxygdn">正向有功总电能</string>
+    <string name="fxygdn">反向有功总电能</string>
+    <string name="Axygdn">A向正向有功电能</string>
+    <string name="Bxygdn">B正向有功电能</string>
+    <string name="Cxygdn">C正向有功电能</string>
+    <string name="num_mobile">15312235652</string>
 </resources>

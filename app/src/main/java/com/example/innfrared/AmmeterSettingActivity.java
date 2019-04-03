@@ -5,7 +5,9 @@ import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.drawable.ColorDrawable;
+import android.net.ParseException;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.util.DisplayMetrics;
@@ -27,6 +29,10 @@ import android.widget.Toast;
 
 import com.dou361.dialogui.DialogUIUtils;
 import com.dou361.dialogui.listener.DialogUIListener;
+
+import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 /**
  * Created by Lenovo on 2019/3/29.
@@ -58,6 +64,8 @@ public class AmmeterSettingActivity extends Activity implements View.OnClickList
     private RelativeLayout rl2;
     private RelativeLayout rl3;
     private Button next;
+    private SharedPreferences sp;
+    private String SN;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -72,6 +80,8 @@ public class AmmeterSettingActivity extends Activity implements View.OnClickList
     @SuppressLint("WrongViewCast")
     private void initView() {
         mActivity=this;
+        SN=getIntent().getStringExtra("SN");
+        sp=getSharedPreferences("Infrared",MODE_PRIVATE);
         DialogUIUtils.init(getApplicationContext());
         back=findViewById(R.id.back);
         tv_title=findViewById(R.id.tv_title);
@@ -101,11 +111,13 @@ public class AmmeterSettingActivity extends Activity implements View.OnClickList
 
     private void initListener() {
         tv_title.setText("配置电表");
+        now_sn.setText("当前采集器SN   "+SN);
         sys.setOnClickListener(this);
         back.setOnClickListener(this);
         review2.setOnClickListener(this);
         more1.setOnClickListener(this);
         next.setOnClickListener(this);
+        add1.setOnClickListener(this);
     }
     private View getPopupWindowContentView() {
         // 一个自定义的布局，作为显示的内容
@@ -290,7 +302,12 @@ public class AmmeterSettingActivity extends Activity implements View.OnClickList
                 break;
             case R.id.add1:
                 //验证一下是否超过12位
-
+                //模拟数据添加（自动补全12位）
+                Log.i("AmmeterSettingActivity", "onClick: ");
+                String updata1=et_db1.getText().toString();
+                DecimalFormat df=new DecimalFormat("000000000000");
+                String str2=df.format(Integer.parseInt(updata1));
+                Log.i("AmmeterSettingActivity", "onClick: "+str2);
                 break;
             case R.id.more2:
                 nowmoreid="2";
@@ -313,9 +330,24 @@ public class AmmeterSettingActivity extends Activity implements View.OnClickList
                 });
                 break;
             case R.id.next:
+                //之后这个界面就不需要来了
                 Intent intent1=new Intent(AmmeterSettingActivity.this,SettingLoadingActivity.class);
+                SimpleDateFormat sdf=new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+                String date=sdf.format(new java.util.Date());
+                //先进行匹配
+                //匹配通过后，本地记录时间
+                SharedPreferences.Editor editor=sp.edit();
+                String db1="123";
+                String db2="456";
+                //这个地方记录SN号
+                editor.putString("SN",SN);
+                editor.putString("db_list",db1+","+db2);
+                editor.putString("lastesttime",date);
+                editor.commit();
                 startActivity(intent1);
+                finish();
                 break;
         }
     }
+
 }

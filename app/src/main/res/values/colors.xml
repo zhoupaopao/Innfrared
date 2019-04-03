@@ -10,4 +10,6 @@
     <color name="pic_col">#414141</color>
     <color name="pic_bottom">#262626</color>
     <color name="red">#FF4500</color>
+    <color name="gray">#708090</color>
+    <color name="gray1">#DBDBDB</color>
 </resources>

@@ -22,9 +22,11 @@ public class SettingLoadingActivity extends Activity {
     private Button bt_back;
     private ProgressBar progressBar;
     private Handler handler;
-    private int nowdata=0;
+//    private int nowdata=0;
     private ImageView iv_unfinish;
     private TextView tv_status;
+    Runnable runnable;
+    long longexpand=0;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -42,12 +44,14 @@ public class SettingLoadingActivity extends Activity {
         progressBar=findViewById(R.id.progressbar);
         iv_unfinish=findViewById(R.id.iv_unfinish);
         tv_status=findViewById(R.id.tv_status);
+        longexpand=getIntent().getLongExtra("longexpand",0);
     }
 
     private void initData() {
         title.setText(R.string.setting_db);
         tv_status.setText(R.string.setting_success);
         iv_unfinish.setImageResource(R.mipmap.finish);
+        progressBar.setMax(300);
     }
 
     private void initListener() {
@@ -59,27 +63,34 @@ public class SettingLoadingActivity extends Activity {
         });
         bt_back.setVisibility(View.GONE);
          handler=new Handler();
-        Runnable runnable=new Runnable(){
+         runnable=new Runnable(){
             @Override
             public void run() {
 // TODO Auto-generated method stub
 //要做的事情
-                Log.i("run: ", nowdata+"");
+                Log.i("run: ", longexpand+"");
 
-                progressBar.setProgress(nowdata);
+                progressBar.setProgress((int)longexpand);
 
-                if(nowdata<100){
-                    handler.postDelayed(this, 100);
-                    nowdata++;
+                if(longexpand<300){
+                    handler.postDelayed(this, 1000);
+                    longexpand++;
                 }else{
                     handler.removeCallbacks(this);
 //                    Intent intent=new Intent(SettingLoadingActivity.this,SettingFinishActivity.class);
                     Intent intent=new Intent(SettingLoadingActivity.this,SettingFinishSuccessActivity.class);
                     startActivity(intent);
+                    finish();
                 }
             }
         };
-        handler.postDelayed(runnable, 500);//每两秒执行一次runnable.
+        handler.postDelayed(runnable, 1000);//每1秒执行一次runnable.
 
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        handler.removeCallbacks(runnable);
     }
 }
