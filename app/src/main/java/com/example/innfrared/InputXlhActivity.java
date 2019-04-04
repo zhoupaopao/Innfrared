@@ -101,12 +101,12 @@ public class InputXlhActivity extends Activity {
     }
     public void doDataloggerCheck(final String re_SN){
         RequestParams params = new RequestParams();
-        params.addHeader("Content-Type", "application/json");
-        JSONObject jsonObject = new JSONObject();
-        jsonObject.put("sn", re_SN);
-        params.setRequestBody(MediaType.parse("application/json"), jsonObject.toString());
+//        params.addHeader("Content-Type", "application/json");
+//        JSONObject jsonObject = new JSONObject();
+//        jsonObject.put("sn", re_SN);
+//        params.setRequestBody(MediaType.parse("application/json"), jsonObject.toString());
         Log.i("onSuccess", Api.doDataloggerCheck +"sn="+re_SN);
-        HttpRequest.get(Api.doDataloggerCheck +"sn="+re_SN, new JsonHttpRequestCallback() {
+        HttpRequest.get(Api.doDataloggerCheck +"sn="+re_SN,params,5000 ,new JsonHttpRequestCallback() {
             @Override
             protected void onSuccess(Headers headers, JSONObject jsonObject) {
                 super.onSuccess(headers, jsonObject);
@@ -122,22 +122,28 @@ public class InputXlhActivity extends Activity {
                     if(et_xlh.getText().toString().equals(lastSn)){
                         //和本地最后记录的相同
                         //查看时间差
-                        Log.e(getClass().getName(), "213");
-                        SimpleDateFormat sdf=new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
-                        String date=sdf.format(new java.util.Date());
-                        String lasttime=sp.getString("lastesttime","");
-                        //时间差（秒）
-                        long longexpand=getTimeExpend(lasttime,date);
-                        if(longexpand>300){
-                            //要么进入配置错误，要么进入配置成功
-                            Intent intent=new Intent(InputXlhActivity.this,SettingFinishSuccessActivity.class);
-                            startActivity(intent);
-                        }else{
-                            //进入等待
-                            Intent intent1=new Intent(InputXlhActivity.this,SettingLoadingActivity.class);
-                            intent1.putExtra("longexpand",longexpand);
-                            startActivity(intent1);
-                        }
+//                        Log.e(getClass().getName(), "213");
+//                        SimpleDateFormat sdf=new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+//                        String date=sdf.format(new java.util.Date());
+//                        String lasttime=sp.getString("lastesttime","");
+//                        //时间差（秒）
+//                        long longexpand=getTimeExpend(lasttime,date);
+//                        if(longexpand>300){
+//                            //要么进入配置错误，要么进入配置成功
+//                            Intent intent=new Intent(InputXlhActivity.this,SettingFinishSuccessActivity.class);
+//                            startActivity(intent);
+//                        }else{
+//                            //进入等待
+//                            Intent intent1=new Intent(InputXlhActivity.this,SettingLoadingActivity.class);
+//                            intent1.putExtra("longexpand",longexpand);
+//                            startActivity(intent1);
+//                        }
+                        //不比较时间，进入添加电表页面
+                        Intent intent2=new Intent();
+                        intent2.putExtra("SN",re_SN);
+                        intent2.putExtra("rem",true);//是读取内存
+                        intent2.setClass(InputXlhActivity.this,AmmeterSettingActivity.class);
+                        startActivity(intent2);
                     }else{
                         SharedPreferences.Editor editor=sp.edit();
                         editor.putString("SN","");
@@ -173,6 +179,9 @@ public class InputXlhActivity extends Activity {
             @Override
             public void onFailure(int errorCode, String msg) {
                 super.onFailure(errorCode, msg);
+                Log.i("onFailure", msg);
+                Toast.makeText(InputXlhActivity.this,"请求超时",Toast.LENGTH_SHORT).show();
+                dialog.dialog.dismiss();
             }
         });
     }

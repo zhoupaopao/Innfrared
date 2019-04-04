@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+   <item>
+       <shape>
+           <solid android:color="@color/gray1"/>
+           <corners android:radius="@dimen/x5"/>
+       </shape>
+   </item>
+    <item android:bottom="1.5dip" android:left="1.5dip" android:right="1.5dip" android:top="1.5dip" >
+        <shape>
+            <!--     View填充颜色 -->
+            <solid android:color="@color/white" />
+            <corners android:radius="@dimen/x5"/>
+
+        </shape>
+    </item>
+</layer-list>

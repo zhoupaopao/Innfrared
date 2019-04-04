@@ -76,7 +76,7 @@ public class ScanQRCodeActivity extends Activity {
             if (result != null){
                 bv_barcode.pause();
                 Log.e(getClass().getName(), "获取到的扫描结果是：" + result.getText());
-                Toast.makeText(ScanQRCodeActivity.this,"获取到的扫描结果是：" + result.getText(),Toast.LENGTH_SHORT).show();
+//                Toast.makeText(ScanQRCodeActivity.this,"获取到的扫描结果是：" + result.getText(),Toast.LENGTH_SHORT).show();
 //可以对result进行一些判断，比如说扫描结果不符合就再进行一次扫描
 //                if (result.getText().contains("符合我的结果")){
                 doDataloggerCheck(result.getText());
@@ -112,12 +112,12 @@ public class ScanQRCodeActivity extends Activity {
     }
     public void doDataloggerCheck(final String re_SN){
         RequestParams params = new RequestParams();
-        params.addHeader("Content-Type", "application/json");
-        JSONObject jsonObject = new JSONObject();
-        jsonObject.put("sn", re_SN);
-        params.setRequestBody(MediaType.parse("application/json"), jsonObject.toString());
+//        params.addHeader("Content-Type", "application/json");
+//        JSONObject jsonObject = new JSONObject();
+//        jsonObject.put("sn", re_SN);
+//        params.setRequestBody(MediaType.parse("application/json"), jsonObject.toString());
         Log.i("onSuccess", Api.doDataloggerCheck +"sn="+re_SN);
-        HttpRequest.get(Api.doDataloggerCheck +"sn="+re_SN, new JsonHttpRequestCallback() {
+        HttpRequest.get(Api.doDataloggerCheck +"sn="+re_SN,params,5000, new JsonHttpRequestCallback() {
             @Override
             protected void onSuccess(Headers headers, JSONObject jsonObject) {
                 super.onSuccess(headers, jsonObject);
@@ -185,6 +185,10 @@ public class ScanQRCodeActivity extends Activity {
             @Override
             public void onFailure(int errorCode, String msg) {
                 super.onFailure(errorCode, msg);
+                Log.i("onFailure", msg);
+                Toast.makeText(ScanQRCodeActivity.this,"请求超时",Toast.LENGTH_SHORT).show();
+                bv_barcode.resume();
+                dialog.dialog.dismiss();
             }
         });
     }

@@ -85,8 +85,11 @@ public class AmmeterSettingActivity extends Activity implements View.OnClickList
     private Boolean cannext=false;//能否下一步
     private BuildBean dialog;
     private Boolean rem;
-//    private String db_num1="";
-//    private String db_num2="";
+    private Boolean nochange=false;//查看数据是否有变化
+    private String db_num1="";//存放的是内存中的原始数据，用来和最终查看的数据进行比对
+    private String db_num2="";
+    private String device_list="";
+    private double pencent=0.0;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -131,6 +134,7 @@ public class AmmeterSettingActivity extends Activity implements View.OnClickList
 
     private void initData() {
         if(rem){
+            nochange=true;
             cannext=true;
             next.setBackgroundResource(R.drawable.btn_blue);
             //读取数据
@@ -138,12 +142,12 @@ public class AmmeterSettingActivity extends Activity implements View.OnClickList
             Log.i("initData: ", db_list);
             String[]dsa=db_list.split(",");
             if(dsa.length==2){
-//                db_num1=dsa[0];
-//                db_num2=dsa[1];
+                db_num1=dsa[0];
+                db_num2=dsa[1];
                 need_updata1=dsa[0];
                 need_updata2=dsa[1];
             }else{
-//                db_num1=dsa[0];
+                db_num1=dsa[0];
                 need_updata1=dsa[0];
             }
             //更改布局
@@ -220,16 +224,23 @@ public class AmmeterSettingActivity extends Activity implements View.OnClickList
                         edit_rootView.findViewById(R.id.sure).setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
-                                DialogUIUtils.dismiss(edit_dialog);
-                                //执行编辑操作
-                                if(nowmoreid=="1"){
-                                    //是第一组数据
-                                    tv_db_num1.setText(ed_text1.getText().toString());
-                                    need_updata1=ed_text1.getText().toString();
+                                if(ed_text1.getText().toString().trim().equals("")){
+                                    //是空
+                                    Toast.makeText(AmmeterSettingActivity.this,"请输入电表号",Toast.LENGTH_SHORT).show();
                                 }else{
-                                    tv_db_num2.setText(ed_text1.getText().toString());
-                                    need_updata2=ed_text1.getText().toString();
+                                    DialogUIUtils.dismiss(edit_dialog);
+                                    nochange=false;
+                                    //执行编辑操作
+                                    if(nowmoreid=="1"){
+                                        //是第一组数据
+                                        tv_db_num1.setText(ed_text1.getText().toString());
+                                        need_updata1=ed_text1.getText().toString();
+                                    }else{
+                                        tv_db_num2.setText(ed_text1.getText().toString());
+                                        need_updata2=ed_text1.getText().toString();
+                                    }
                                 }
+
                             }
                         });
                         break;
@@ -263,6 +274,7 @@ public class AmmeterSettingActivity extends Activity implements View.OnClickList
                             @Override
                             public void onClick(View v) {
                                 DialogUIUtils.dismiss(delete_dialog);
+                                nochange=false;
                                 //执行删除操作
                                 if(nowmoreid=="1"){
                                     //是第一组数据
@@ -339,13 +351,35 @@ public class AmmeterSettingActivity extends Activity implements View.OnClickList
                         break;
                     case R.id.rl3:
                         //查看数据
-                        Intent intent=new Intent(AmmeterSettingActivity.this,LookDataActivity.class);
-                        startActivity(intent);
+
                         if(nowmoreid=="1"){
                             //是第一组数据
-
+                            //判断是否是内存中记录的数据
+                            Log.i("onClick:1 ", need_updata1+"|"+db_num1+"|"+db_num2);
+                            if(need_updata1.equals(db_num1)||need_updata1.equals(db_num2)){
+                                //等于1或者2
+                                //进入成功页面
+                                Intent intent=new Intent(AmmeterSettingActivity.this,SettingFinishSuccessDetailActivity.class);
+                                intent.putExtra("db_num",need_updata1);
+                                startActivity(intent);
+                            }else{
+                                Intent intent=new Intent(AmmeterSettingActivity.this,LookDataActivity.class);
+                                startActivity(intent);
+                            }
+                            //
                         }else{
-
+                            //第二组数据
+                            Log.i("onClick:2 ", need_updata2+"|"+db_num1+"|"+db_num2);
+                            if(need_updata2.equals(db_num1)||need_updata2.equals(db_num2)){
+                                //等于1或者2
+                                //进入成功页面
+                                Intent intent=new Intent(AmmeterSettingActivity.this,SettingFinishSuccessDetailActivity.class);
+                                intent.putExtra("db_num",need_updata2);
+                                startActivity(intent);
+                            }else{
+                                Intent intent=new Intent(AmmeterSettingActivity.this,LookDataActivity.class);
+                                startActivity(intent);
+                            }
                         }
                         break;
 
@@ -376,7 +410,9 @@ public class AmmeterSettingActivity extends Activity implements View.OnClickList
 //        Log.d("h_bl", "屏幕密度（0.75 / 1.0 / 1.5）：" + density);
 //        Log.d("h_bl", "屏幕密度dpi（120 / 160 / 240）：" + densityDpi);
         Log.d("h_bl", "屏幕宽度（dp）：" + screenWidth);
-//        Log.d("h_bl", "屏幕高度（dp）：" + screenHeight);
+        Log.d("h_bl", "屏幕高度（dp）：" + screenHeight);
+        pencent=(float)width/(float) screenWidth;
+        Log.d("h_bl", "比例：" + pencent);
     }
     private void bgAlpha(float alpha) {
         WindowManager.LayoutParams lp = this.getWindow().getAttributes();
@@ -385,8 +421,9 @@ public class AmmeterSettingActivity extends Activity implements View.OnClickList
     }
     private void showPopupWindow(View anchorView) {
         View contentView = getPopupWindowContentView();
+        Log.i("showPopupWindow: ", 120*pencent+"");
         mPopupWindow = new PopupWindow(contentView,
-                width-60, 350, true);
+                width-60, (int) (120*pencent), true);
 //        mPopupWindow.setWidth((int)3500);
         // 如果不设置PopupWindow的背景，有些版本就会出现一个问题：无论是点击外部区域还是Back键都无法dismiss弹框
         mPopupWindow.setBackgroundDrawable(new ColorDrawable());
@@ -499,6 +536,7 @@ public class AmmeterSettingActivity extends Activity implements View.OnClickList
                     }else{
                         //界面发生变化
                         //添加电表隐藏，edittext隐藏，textview显示，最后一个图标变成...，设置图标属性
+                        nochange=false;
                         tv_add_db2.setVisibility(View.GONE);
                         need_updata2=et_db2.getText().toString();
                         tv_db_num2.setText(et_db2.getText().toString());
@@ -540,22 +578,7 @@ public class AmmeterSettingActivity extends Activity implements View.OnClickList
                 //判断是否有数据
                 if(cannext){
                     //请求数据，将SN号上传，获取电表deviceid
-                    Intent intent1=new Intent(AmmeterSettingActivity.this,SettingLoadingActivity.class);
-                    SimpleDateFormat sdf=new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
-                    String date=sdf.format(new java.util.Date());
-                    //先进行匹配
-                    //匹配通过后，本地记录时间
-                    SharedPreferences.Editor editor=sp.edit();
-                    String db1=need_updata1;
-                    String db2=need_updata2;
-                    //这个地方记录SN号
-                    Log.i("onClick: ", db1+","+db2);
-                    editor.putString("SN",SN);
-                    editor.putString("db_list",db1+","+db2);
-                    editor.putString("lastesttime",date);
-                    editor.commit();
-                    startActivity(intent1);
-                    finish();
+
                     //不需要请求这个接口
                     //最后才获取
 //                    SN="1415094552";
@@ -597,6 +620,56 @@ public class AmmeterSettingActivity extends Activity implements View.OnClickList
 //                            dialog.dialog.dismiss();
 //                        }
 //                    });
+                    //先看是不是之前记录的电表
+                    //不是就loading
+                    //是的话查看时间
+                    if(nochange){
+                        //没有改变，通过时间进入loading和success
+                        Log.e(getClass().getName(), "213");
+                        SimpleDateFormat sdf=new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+                        String date=sdf.format(new java.util.Date());
+                        String lasttime=sp.getString("lastesttime","");
+                        //时间差（秒）
+                        long longexpand=getTimeExpend(lasttime,date);
+                        if(longexpand>300){
+                            //要么进入配置错误，要么进入配置成功
+                            //请求接口查看进入对和错界面或者一对易错
+                            String list_dbs=sp.getString("db_list","");
+                            String[]dsa=list_dbs.split(",");
+                            if(dsa.length==2){
+                                db_num1=dsa[0];
+                                db_num2=dsa[1];
+                            }else{
+                                db_num1=dsa[0];
+                            }
+                            checkdb(db_num1,db_num2);
+//                            Intent intentt=new Intent(AmmeterSettingActivity.this,SettingFinishSuccessActivity.class);
+//                            startActivity(intentt);
+                        }else{
+                            //进入等待
+                            Intent intent1=new Intent(AmmeterSettingActivity.this,SettingLoadingActivity.class);
+                            intent1.putExtra("longexpand",longexpand);
+                            startActivity(intent1);
+                        }
+                    }else{
+                        Intent intent1=new Intent(AmmeterSettingActivity.this,SettingLoadingActivity.class);
+                        SimpleDateFormat sdf=new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+                        String date=sdf.format(new java.util.Date());
+                        //先进行匹配
+                        //匹配通过后，本地记录时间
+                        SharedPreferences.Editor editor=sp.edit();
+                        String db1=need_updata1;
+                        String db2=need_updata2;
+                        //这个地方记录SN号
+                        Log.i("onClick: ", db1+","+db2);
+                        editor.putString("SN",SN);
+                        editor.putString("db_list",db1+","+db2);
+                        editor.putString("lastesttime",date);
+                        editor.commit();
+                        startActivity(intent1);
+                        finish();
+                    }
+
                 }else{
 
                 }
@@ -604,11 +677,151 @@ public class AmmeterSettingActivity extends Activity implements View.OnClickList
                 break;
         }
     }
+    private void checkdb(final String db1, final String db2){
+
+        HttpRequest.get(Api.getAmmetersByDatalogerSn +SN, new JsonHttpRequestCallback() {
+            @Override
+            protected void onSuccess(Headers headers, JSONObject jsonObject) {
+                super.onSuccess(headers, jsonObject);
+                Log.i("onSuccess", jsonObject.toString());
+
+                dialog.dialog.dismiss();
+
+            }
+            @Override
+            public void onStart () {
+                super.onStart();
+                dialog = DialogUIUtils.showLoading(AmmeterSettingActivity.this, "请求中...", true, true, false, true);
+                dialog.show();
+            }
+            @Override
+            public void onFailure ( int errorCode, String msg){
+                super.onFailure(errorCode, msg);
+//                                Toast.makeText(AmmeterSettingActivity.this,"采集器下没有电表",Toast.LENGTH_SHORT).show();
+                dialog.dialog.dismiss();
+            }
+
+            @Override
+            public void onResponse(String response, Headers headers) {
+                super.onResponse(response, headers);
+                Log.i("onClick2: ", response);
+                JSONArray jsonArray=JSONArray.parseArray(response);
+                boolean isyes1=false;//电表1是否成功
+                boolean isyes2=true;//电表2是否成功
+
+                dialog.dialog.dismiss();
+                if(db2.equals("")){
+                    //只有一个电表
+                    for(int i=0;i<jsonArray.size();i++){
+                        String ssn=jsonArray.getJSONObject(i).getString("sn");
+                        String ddb1=achieve_format(db1).toString();
+                        Log.i("onResponse: ", ssn+"|"+ddb1);
+//                                    String ddbb=ddb1.substring(0,12);
+                        Log.i("onResponse: ", ddb1);
+                        Log.i("onResponse: ", ssn);
+
+                        if(ssn.contains(ddb1)){
+                            isyes1=true;
+                            device_list=jsonArray.getJSONObject(i).getString("deviceId");
+                            //切换页面
+                            Log.i("isyes1: ", "312");
+                            break;
+                        }
+                    }
+                    if(isyes1){
+                        //成功
+                        Log.i("isyes1", "onResponse: ");
+                        Intent intent=new Intent(AmmeterSettingActivity.this,SettingFinishSuccessActivity.class);
+                        intent.putExtra("device_list",device_list);
+                        startActivity(intent);
+                        finish();
+                    }else{
+                        //失败
+                        Log.i("isyes1", "onResponse2: ");
+                        Intent intent=new Intent(AmmeterSettingActivity.this,SettingFinishActivity.class);
+                        startActivity(intent);
+                        finish();
+                    }
+                }else{
+                    //两个电表
+                    isyes1=false;
+                    isyes2=false;
+                    for(int i=0;i<jsonArray.size();i++){
+                        if(jsonArray.getJSONObject(i).getString("sn").equals(achieve_format(db1))){
+                            isyes1=true;
+                            if(device_list.equals("")){
+                                device_list=jsonArray.getJSONObject(i).getString("deviceId");
+                            }else{
+                                device_list=device_list+","+jsonArray.getJSONObject(i).getString("deviceId");
+                            }
+                            continue;
+                        }
+                        if(jsonArray.getJSONObject(i).getString("sn").equals(achieve_format(db2))){
+                            isyes2=true;
+                            if(device_list.equals("")){
+                                device_list=jsonArray.getJSONObject(i).getString("deviceId");
+                            }else{
+                                device_list=device_list+","+jsonArray.getJSONObject(i).getString("deviceId");
+                            }
+                            continue;
+                        }
+                    }
+                    if(isyes1&&isyes2){
+                        //配置成功界面
+                        Intent intent=new Intent(AmmeterSettingActivity.this,SettingFinishSuccessActivity.class);
+                        intent.putExtra("device_list",device_list);
+                        startActivity(intent);
+                        finish();
+                    }else if((!isyes1)&&(!isyes2)){
+                        //配置失败
+                        Intent intent=new Intent(AmmeterSettingActivity.this,SettingFinishActivity.class);
+                        intent.putExtra("device_list",device_list);
+                        startActivity(intent);
+                        finish();
+                    }else{
+                        //一个成功一个失败
+//                        Toast.makeText(AmmeterSettingActivity.this,"一个成功一个失败，页面开发中",Toast.LENGTH_SHORT).show();
+                        Intent intent=new Intent(AmmeterSettingActivity.this,SettingFinishFailSucActivity.class);
+                        intent.putExtra("isyes1",isyes1);//看1是正确还是2是正确
+                        intent.putExtra("device_list",device_list);//成功的deviceid
+                        startActivity(intent);
+                        finish();
+                    }
+                }
+
+
+            }
+        });
+    }
+    private long getTimeExpend(String startTime, String endTime){
+        //传入字串类型 2016/06/28 08:30
+        long longStart = getTimeMillis(startTime); //获取开始时间毫秒数
+        long longEnd = getTimeMillis(endTime);  //获取结束时间毫秒数
+        long longExpend = longEnd - longStart;  //获取时间差
+        long longsecond=longExpend/1000;
+
+
+        return longsecond;
+    }
+    private long getTimeMillis(String strTime) {
+        long returnMillis = 0;
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+        Date d = null;
+        try {
+            d = sdf.parse(strTime);
+            returnMillis = d.getTime();
+        } catch (ParseException e) {
+            Toast.makeText(AmmeterSettingActivity.this, e.toString(), Toast.LENGTH_SHORT).show();
+        } catch (java.text.ParseException e) {
+            e.printStackTrace();
+        }
+        return returnMillis;
+    }
     //自动补全12位，同时按照要求从后到前每隔2位重组
     private String achieve_format(String updata1){
         String las_sub="";
         DecimalFormat df=new DecimalFormat("000000000000");
-        String str2=df.format(Integer.parseInt(updata1));
+        String str2=df.format(Long.parseLong(updata1));
 
         for(int i=0;i<6;i++){
             String sub_str=str2.substring(12-i*2-2, 12-i*2);

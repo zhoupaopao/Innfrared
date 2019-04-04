@@ -12,6 +12,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
@@ -191,6 +192,7 @@ public class SettingLoadingActivity extends Activity {
                                     //失败
                                     Log.i("isyes1", "onResponse2: ");
                                     Intent intent=new Intent(SettingLoadingActivity.this,SettingFinishActivity.class);
+                                    intent.putExtra("device_list",device_list);
                                     startActivity(intent);
                                     finish();
                                 }
@@ -198,28 +200,54 @@ public class SettingLoadingActivity extends Activity {
                                 //两个电表
                                 isyes1=false;
                                 isyes2=false;
+                                Log.i("intent", achieve_format(db1)+"|"+achieve_format(db2));
                                 for(int i=0;i<jsonArray.size();i++){
                                     if(jsonArray.getJSONObject(i).getString("sn").equals(achieve_format(db1))){
                                         isyes1=true;
+                                        Log.i("isyes1", "true");
+                                        if(device_list.equals("")){
+                                            device_list=jsonArray.getJSONObject(i).getString("deviceId");
+                                        }else{
+                                            device_list=device_list+","+jsonArray.getJSONObject(i).getString("deviceId");
+                                        }
+
                                         continue;
                                     }
                                     if(jsonArray.getJSONObject(i).getString("sn").equals(achieve_format(db2))){
                                         isyes2=true;
+                                        Log.i("isyes2", "true");
+                                        if(device_list.equals("")){
+                                            device_list=jsonArray.getJSONObject(i).getString("deviceId");
+                                        }else{
+                                            device_list=device_list+","+jsonArray.getJSONObject(i).getString("deviceId");
+                                        }
                                         continue;
                                     }
                                 }
+                                Log.i("intent", isyes1+"|"+isyes2);
                                 if(isyes1&&isyes2){
                                     //配置成功界面
                                     Intent intent=new Intent(SettingLoadingActivity.this,SettingFinishSuccessActivity.class);
+                                    intent.putExtra("device_list",device_list);
                                     startActivity(intent);
                                     finish();
-                                }else if(isyes1||isyes2){
+                                }else if((!isyes1)&&(!isyes2)){
                                     //配置失败
+                                    Log.i("intent", "fail: ");
                                     Intent intent=new Intent(SettingLoadingActivity.this,SettingFinishActivity.class);
+                                    intent.putExtra("device_list",device_list);
                                     startActivity(intent);
                                     finish();
                                 }else{
+                                    Log.i("intent", "failsuccess: ");
                                     //一个成功一个失败
+//                                    Toast.makeText(SettingLoadingActivity.this,"一个成功一个失败，页面开发中",Toast.LENGTH_SHORT).show();
+                                    Intent intent=new Intent(SettingLoadingActivity.this,SettingFinishFailSucActivity.class);
+                                    intent.putExtra("isyes1",isyes1);//看1是正确还是2是正确
+                                    intent.putExtra("device_list",device_list);//成功的deviceid
+                                    startActivity(intent);
+                                    finish();
+
                                 }
                             }
 
