@@ -94,7 +94,7 @@ public class SettingLoadingActivity extends Activity {
                 progressBar.setProgress((int)longexpand);
 
                 if(longexpand<300){
-                    handler.postDelayed(this, 10);
+                    handler.postDelayed(this, 1000);
                     longexpand++;
                 }else{
                     handler.removeCallbacks(this);
