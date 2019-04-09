@@ -101,6 +101,19 @@ public class AmmeterSettingActivity extends Activity implements View.OnClickList
         initListener();
     }
 
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+        Log.i("TAG", "onRestart: ");
+        nochange=true;
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        Log.i("TAG", "onResume: ");
+    }
+
     @SuppressLint("WrongViewCast")
     private void initView() {
         mActivity=this;
@@ -652,22 +665,12 @@ public class AmmeterSettingActivity extends Activity implements View.OnClickList
                             startActivity(intent1);
                         }
                     }else{
-                        Intent intent1=new Intent(AmmeterSettingActivity.this,SettingLoadingActivity.class);
-                        SimpleDateFormat sdf=new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
-                        String date=sdf.format(new java.util.Date());
-                        //先进行匹配
-                        //匹配通过后，本地记录时间
-                        SharedPreferences.Editor editor=sp.edit();
+                        //先将sn和电表传到后台成功的话就继续
+//                        sn=采集器sn&devuceSn=电表的sn号
                         String db1=need_updata1;
                         String db2=need_updata2;
-                        //这个地方记录SN号
-                        Log.i("onClick: ", db1+","+db2);
-                        editor.putString("SN",SN);
-                        editor.putString("db_list",db1+","+db2);
-                        editor.putString("lastesttime",date);
-                        editor.commit();
-                        startActivity(intent1);
-                        finish();
+                        saveCommandAmmeter(SN,db1,db2);
+
                     }
 
                 }else{
@@ -676,6 +679,64 @@ public class AmmeterSettingActivity extends Activity implements View.OnClickList
 
                 break;
         }
+    }
+    private  void saveCommandAmmeter(String sn, final String db1, final String db2){
+        String up_db1="";
+        String up_db2="";
+        if(db2.equals("")){
+             up_db1=achieve_format(db1);
+        }else{
+            //两个电表
+             up_db1=achieve_format(db1);
+             up_db2=achieve_format(db2);
+        }
+        String up_dbs=up_db1+","+up_db2;
+        Log.i("saveCommandAmmeter: ", Api.saveCommandAmmeter+"sn="+sn+"&deviceSn="+up_dbs);
+        HttpRequest.get(Api.saveCommandAmmeter+"sn="+sn+"&deviceSn="+up_dbs,new JsonHttpRequestCallback(){
+            @Override
+            protected void onSuccess(Headers headers, JSONObject jsonObject) {
+                super.onSuccess(headers, jsonObject);
+                Log.i("onSuccess", jsonObject.toString());
+
+                dialog.dialog.dismiss();
+                if(jsonObject.getString("result").equals("1")){
+                    //成功
+                    Intent intent1=new Intent(AmmeterSettingActivity.this,SettingLoadingActivity.class);
+                    SimpleDateFormat sdf=new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+                    String date=sdf.format(new java.util.Date());
+                    //先进行匹配
+                    //匹配通过后，本地记录时间
+                    SharedPreferences.Editor editor=sp.edit();
+//                        String db1=need_updata1;
+//                        String db2=need_updata2;
+                    //这个地方记录SN号
+                    Log.i("onClick: ", db1+","+db2);
+                    editor.putString("SN",SN);
+                    editor.putString("db_list",db1+","+db2);
+                    editor.putString("lastesttime",date);
+                    editor.commit();
+                    startActivity(intent1);
+//                    finish();
+                }else{
+                    Toast.makeText(AmmeterSettingActivity.this,"保存电表异常",Toast.LENGTH_SHORT).show();
+                }
+
+
+            }
+            @Override
+            public void onStart () {
+                super.onStart();
+                dialog = DialogUIUtils.showLoading(AmmeterSettingActivity.this, "保存中...", true, true, false, true);
+                dialog.show();
+            }
+            @Override
+            public void onFailure ( int errorCode, String msg){
+                super.onFailure(errorCode, msg);
+                Toast.makeText(AmmeterSettingActivity.this,"网络异常",Toast.LENGTH_SHORT).show();
+                dialog.dialog.dismiss();
+
+            }
+        });
     }
     private void checkdb(final String db1, final String db2){
 
@@ -734,58 +795,77 @@ public class AmmeterSettingActivity extends Activity implements View.OnClickList
                         Intent intent=new Intent(AmmeterSettingActivity.this,SettingFinishSuccessActivity.class);
                         intent.putExtra("device_list",device_list);
                         startActivity(intent);
-                        finish();
+//                        finish();
                     }else{
                         //失败
                         Log.i("isyes1", "onResponse2: ");
                         Intent intent=new Intent(AmmeterSettingActivity.this,SettingFinishActivity.class);
                         startActivity(intent);
-                        finish();
+//                        finish();
                     }
                 }else{
                     //两个电表
                     isyes1=false;
                     isyes2=false;
+                    String ddd1="";
+                    String ddd2="";
                     for(int i=0;i<jsonArray.size();i++){
                         if(jsonArray.getJSONObject(i).getString("sn").equals(achieve_format(db1))){
                             isyes1=true;
-                            if(device_list.equals("")){
-                                device_list=jsonArray.getJSONObject(i).getString("deviceId");
-                            }else{
-                                device_list=device_list+","+jsonArray.getJSONObject(i).getString("deviceId");
-                            }
-                            continue;
+                            ddd1=jsonArray.getJSONObject(i).getString("deviceId");
+//                            Log.i("onResponse: ", "1");
+//                            if(device_list.equals("")){
+//                                device_list=jsonArray.getJSONObject(i).getString("deviceId");
+//                            }else{
+//                                device_list=device_list+","+jsonArray.getJSONObject(i).getString("deviceId");
+//                            }
+//                            continue;
                         }
+
+                    }
+                    for(int i=0;i<jsonArray.size();i++){
                         if(jsonArray.getJSONObject(i).getString("sn").equals(achieve_format(db2))){
                             isyes2=true;
-                            if(device_list.equals("")){
-                                device_list=jsonArray.getJSONObject(i).getString("deviceId");
-                            }else{
-                                device_list=device_list+","+jsonArray.getJSONObject(i).getString("deviceId");
-                            }
-                            continue;
+                            ddd2=jsonArray.getJSONObject(i).getString("deviceId");
+//                            Log.i("onResponse: ", "2");
+//                            if(device_list.equals("")){
+//                                device_list=jsonArray.getJSONObject(i).getString("deviceId");
+//                            }else{
+//                                device_list=device_list+","+jsonArray.getJSONObject(i).getString("deviceId");
+//                            }
+//                            continue;
                         }
                     }
+
+
+                    Log.i("onResponse: ", device_list);
                     if(isyes1&&isyes2){
                         //配置成功界面
+                        device_list=ddd1+","+ddd2;
                         Intent intent=new Intent(AmmeterSettingActivity.this,SettingFinishSuccessActivity.class);
                         intent.putExtra("device_list",device_list);
                         startActivity(intent);
-                        finish();
+//                        finish();
                     }else if((!isyes1)&&(!isyes2)){
                         //配置失败
+                        device_list="";
                         Intent intent=new Intent(AmmeterSettingActivity.this,SettingFinishActivity.class);
                         intent.putExtra("device_list",device_list);
                         startActivity(intent);
-                        finish();
+//                        finish();
                     }else{
                         //一个成功一个失败
 //                        Toast.makeText(AmmeterSettingActivity.this,"一个成功一个失败，页面开发中",Toast.LENGTH_SHORT).show();
+                        if(isyes1){
+                            device_list=ddd1;
+                        }else{
+                            device_list=ddd2;
+                        }
                         Intent intent=new Intent(AmmeterSettingActivity.this,SettingFinishFailSucActivity.class);
                         intent.putExtra("isyes1",isyes1);//看1是正确还是2是正确
                         intent.putExtra("device_list",device_list);//成功的deviceid
                         startActivity(intent);
-                        finish();
+//                        finish();
                     }
                 }
 

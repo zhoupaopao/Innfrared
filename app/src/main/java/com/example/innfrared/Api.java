@@ -12,5 +12,7 @@ public class Api {
     public  static  String getAmmetersByDatalogerSn="http://192.168.30.41:18015/v00009/epc/device/ammeter/getAmmetersByDatalogerSn.json?sn=";
     //获取电表的详细信息
     public  static  String doDetail="http://192.168.30.41:18015/v00009/epc/device/ammeter/doDetail.json?uid=1&companyId=1&deviceId=";
+    //绑定采集器和电表
+    public  static  String saveCommandAmmeter="http://192.168.30.41:18015/v00009/epc/device/ammeter/saveCommandAmmeter.json?uid=1&";
 
 }

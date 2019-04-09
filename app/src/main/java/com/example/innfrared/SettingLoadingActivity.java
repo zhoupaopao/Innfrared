@@ -94,7 +94,7 @@ public class SettingLoadingActivity extends Activity {
                 progressBar.setProgress((int)longexpand);
 
                 if(longexpand<300){
-                    handler.postDelayed(this, 1000);
+                    handler.postDelayed(this, 10);
                     longexpand++;
                 }else{
                     handler.removeCallbacks(this);
@@ -200,39 +200,45 @@ public class SettingLoadingActivity extends Activity {
                                 //两个电表
                                 isyes1=false;
                                 isyes2=false;
+                                String ddd1="";
+                                String ddd2="";
                                 Log.i("intent", achieve_format(db1)+"|"+achieve_format(db2));
                                 for(int i=0;i<jsonArray.size();i++){
                                     if(jsonArray.getJSONObject(i).getString("sn").equals(achieve_format(db1))){
                                         isyes1=true;
-                                        Log.i("isyes1", "true");
-                                        if(device_list.equals("")){
-                                            device_list=jsonArray.getJSONObject(i).getString("deviceId");
-                                        }else{
-                                            device_list=device_list+","+jsonArray.getJSONObject(i).getString("deviceId");
-                                        }
-
-                                        continue;
+                                        ddd1=jsonArray.getJSONObject(i).getString("deviceId");
+//                                        Log.i("isyes1", "true");
+//                                        if(device_list.equals("")){
+//                                            device_list=jsonArray.getJSONObject(i).getString("deviceId");
+//                                        }else{
+//                                            device_list=device_list+","+jsonArray.getJSONObject(i).getString("deviceId");
+//                                        }
+//
+//                                        continue;
                                     }
                                     if(jsonArray.getJSONObject(i).getString("sn").equals(achieve_format(db2))){
                                         isyes2=true;
-                                        Log.i("isyes2", "true");
-                                        if(device_list.equals("")){
-                                            device_list=jsonArray.getJSONObject(i).getString("deviceId");
-                                        }else{
-                                            device_list=device_list+","+jsonArray.getJSONObject(i).getString("deviceId");
-                                        }
-                                        continue;
+                                        ddd2=jsonArray.getJSONObject(i).getString("deviceId");
+//                                        Log.i("isyes2", "true");
+//                                        if(device_list.equals("")){
+//                                            device_list=jsonArray.getJSONObject(i).getString("deviceId");
+//                                        }else{
+//                                            device_list=device_list+","+jsonArray.getJSONObject(i).getString("deviceId");
+//                                        }
+//                                        continue;
                                     }
                                 }
                                 Log.i("intent", isyes1+"|"+isyes2);
                                 if(isyes1&&isyes2){
                                     //配置成功界面
+                                    device_list=ddd1+","+ddd2;
                                     Intent intent=new Intent(SettingLoadingActivity.this,SettingFinishSuccessActivity.class);
                                     intent.putExtra("device_list",device_list);
                                     startActivity(intent);
                                     finish();
                                 }else if((!isyes1)&&(!isyes2)){
                                     //配置失败
+                                    device_list="";
                                     Log.i("intent", "fail: ");
                                     Intent intent=new Intent(SettingLoadingActivity.this,SettingFinishActivity.class);
                                     intent.putExtra("device_list",device_list);
@@ -241,6 +247,11 @@ public class SettingLoadingActivity extends Activity {
                                 }else{
                                     Log.i("intent", "failsuccess: ");
                                     //一个成功一个失败
+                                    if(isyes1){
+                                        device_list=ddd1;
+                                    }else{
+                                        device_list=ddd2;
+                                    }
 //                                    Toast.makeText(SettingLoadingActivity.this,"一个成功一个失败，页面开发中",Toast.LENGTH_SHORT).show();
                                     Intent intent=new Intent(SettingLoadingActivity.this,SettingFinishFailSucActivity.class);
                                     intent.putExtra("isyes1",isyes1);//看1是正确还是2是正确
@@ -259,6 +270,7 @@ public class SettingLoadingActivity extends Activity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        Log.i("TAG", "onDestroy: ");
         handler.removeCallbacks(runnable);
     }
 }

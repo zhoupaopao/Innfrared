@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.util.Log;
 import android.view.Gravity;
@@ -48,11 +49,12 @@ public class CheckDataActivity extends Activity {
     private LinearLayout ll1;
     private LinearLayout ll2;
     private String device_list="";
-//    private BuildBean dialog;
+
     private String deviceId1="";
     private String deviceId2="";
     private Boolean isyes1;
     private Boolean isyes2;
+    private ImageView refresh;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -77,6 +79,7 @@ public class CheckDataActivity extends Activity {
         fxygdn2=findViewById(R.id.fxygdn2);;
         ll1=findViewById(R.id.ll1);
         ll2=findViewById(R.id.ll2);
+        refresh=findViewById(R.id.question);
         sp=getSharedPreferences("Infrared",MODE_PRIVATE);
         device_list=getIntent().getStringExtra("device_list");
         isyes1=getIntent().getBooleanExtra("isyes1",true);
@@ -90,9 +93,11 @@ public class CheckDataActivity extends Activity {
         Log.i("initData: ", device_list);
         String[]dsa=db_list.split(",");
         String[]lists_dev=device_list.split(",");
+
         if(dsa.length==2){
             need_updata1=dsa[0];
             need_updata2=dsa[1];
+            Log.i("initData: ", need_updata1+"|"+need_updata2);
             if(isyes1){
                 //第一组数据是true
                 tv_db1.setText("正在从电表"+need_updata1+"读取数据");
@@ -130,28 +135,42 @@ public class CheckDataActivity extends Activity {
         //请求数据
 
     }
+    private void refresh(){
+        initData();
+    }
+
     private  void achieveData(String deviceId, final String index){
         Log.i("onClick2: ", Api.doDetail +deviceId);
+        final BuildBean[] dialog = new BuildBean[1];
         HttpRequest.get(Api.doDetail +deviceId, new JsonHttpRequestCallback() {
             @Override
             protected void onSuccess(Headers headers, JSONObject jsonObject) {
                 super.onSuccess(headers, jsonObject);
                 Log.i("onSuccess", jsonObject.toString());
 
-//                dialog.dialog.dismiss();
 
+                Handler handler=new Handler();
+                Runnable runnable=new Runnable(){
+                    @Override
+                    public void run() {
+// TODO Auto-generated method stub
+//要做的事情
+                        dialog[0].dialog.dismiss();
+                    }
+                };
+                handler.postDelayed(runnable, 500);//每1秒执行一次runnable.
             }
             @Override
             public void onStart () {
                 super.onStart();
-//                dialog = DialogUIUtils.showLoading(CheckDataActivity.this, "请求中...", true, true, false, true);
-//                dialog.show();
+                dialog[0] = DialogUIUtils.showLoading(CheckDataActivity.this, "请求中...", true, true, false, true);
+                dialog[0].show();
             }
             @Override
             public void onFailure ( int errorCode, String msg){
                 super.onFailure(errorCode, msg);
 //                                Toast.makeText(AmmeterSettingActivity.this,"采集器下没有电表",Toast.LENGTH_SHORT).show();
-//                dialog.dialog.dismiss();
+               dialog[0].dialog.dismiss();
             }
 
             @Override
@@ -164,6 +183,8 @@ public class CheckDataActivity extends Activity {
                     Toast.makeText(CheckDataActivity.this,"请求失败",Toast.LENGTH_SHORT).show();
                 }else{
                     JSONArray realTimeDataTotal=jsonArrayyy.getJSONObject("DeviceWapper").getJSONArray("realTimeDataTotal");
+                    String updateDate=jsonArrayyy.getJSONObject("DeviceWapper").getString("updateDate");
+                    Log.i("onResponse: ", updateDate);
                     Log.i("onClick2: ", realTimeDataTotal.toString());
                     for(int i=0;i<realTimeDataTotal.size();i++){
                         JSONObject json=realTimeDataTotal.getJSONObject(i);
@@ -194,6 +215,12 @@ public class CheckDataActivity extends Activity {
     }
 
     private void initListener() {
+        refresh.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                initData();
+            }
+        });
         call.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
