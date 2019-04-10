@@ -28,6 +28,7 @@ public class SettingFinishActivity extends Activity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settinng_finish);
+        SysApplication.getInstance().addActivity(this);
         ImBarUtils.setBar(this);
         initView();
         initData();
@@ -67,7 +68,7 @@ public class SettingFinishActivity extends Activity {
         rescan.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                finish();
+                SysApplication.getInstance().exit();
             }
         });
         call.setOnClickListener(new View.OnClickListener() {

@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.Dialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.ParseException;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -22,6 +23,9 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.dou361.dialogui.DialogUIUtils;
 import com.dou361.dialogui.bean.BuildBean;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import cn.finalteam.okhttpfinal.HttpRequest;
 import cn.finalteam.okhttpfinal.JsonHttpRequestCallback;
@@ -55,10 +59,13 @@ public class CheckDataActivity extends Activity {
     private Boolean isyes1;
     private Boolean isyes2;
     private ImageView refresh;
+    private TextView updateDate1;
+    private TextView updateDate2;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_check_data);
+        SysApplication.getInstance().addActivity(this);
         ImBarUtils.setBar(this);
         initView();
         initData();
@@ -80,6 +87,9 @@ public class CheckDataActivity extends Activity {
         ll1=findViewById(R.id.ll1);
         ll2=findViewById(R.id.ll2);
         refresh=findViewById(R.id.question);
+        refresh.setImageResource(R.mipmap.refresh);
+        updateDate1=findViewById(R.id.updateDate1);
+        updateDate2=findViewById(R.id.updateDate2);
         sp=getSharedPreferences("Infrared",MODE_PRIVATE);
         device_list=getIntent().getStringExtra("device_list");
         isyes1=getIntent().getBooleanExtra("isyes1",true);
@@ -138,7 +148,20 @@ public class CheckDataActivity extends Activity {
     private void refresh(){
         initData();
     }
-
+    private long getTimeMillis(String strTime) {
+        long returnMillis = 0;
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        Date d = null;
+        try {
+            d = sdf.parse(strTime);
+            returnMillis = d.getTime();
+        } catch (ParseException e) {
+            Toast.makeText(CheckDataActivity.this, e.toString(), Toast.LENGTH_SHORT).show();
+        } catch (java.text.ParseException e) {
+            e.printStackTrace();
+        }
+        return returnMillis;
+    }
     private  void achieveData(String deviceId, final String index){
         Log.i("onClick2: ", Api.doDetail +deviceId);
         final BuildBean[] dialog = new BuildBean[1];
@@ -185,6 +208,15 @@ public class CheckDataActivity extends Activity {
                     JSONArray realTimeDataTotal=jsonArrayyy.getJSONObject("DeviceWapper").getJSONArray("realTimeDataTotal");
                     String updateDate=jsonArrayyy.getJSONObject("DeviceWapper").getString("updateDate");
                     Log.i("onResponse: ", updateDate);
+                    long mill=getTimeMillis(updateDate)+8*60*60*1000;
+                    Date date = new Date(mill);
+                    SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                    String dateee=sdf.format(date);
+                    if(index.equals("1")){
+                        updateDate1.setText(dateee);
+                    }else{
+                        updateDate2.setText(dateee);
+                    }
                     Log.i("onClick2: ", realTimeDataTotal.toString());
                     for(int i=0;i<realTimeDataTotal.size();i++){
                         JSONObject json=realTimeDataTotal.getJSONObject(i);
@@ -235,7 +267,7 @@ public class CheckDataActivity extends Activity {
             @Override
             public void onClick(View v) {
                 //按理退回到扫描界面
-                finish();
+                SysApplication.getInstance().exit();
             }
         });
         back.setOnClickListener(new View.OnClickListener() {

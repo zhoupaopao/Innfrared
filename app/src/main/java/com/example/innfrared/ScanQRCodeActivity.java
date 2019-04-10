@@ -158,7 +158,7 @@ public class ScanQRCodeActivity extends Activity {
                         startActivity(intent2);
                     }else{
                         SharedPreferences.Editor editor=sp.edit();
-                        editor.putString("SN","");
+                        editor.putString("SN",re_SN);
                         editor.putString("db_list","");
                         editor.putString("lastesttime","");
                         editor.commit();

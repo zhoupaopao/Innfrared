@@ -94,6 +94,7 @@ public class AmmeterSettingActivity extends Activity implements View.OnClickList
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_ammeter_setting);
+        SysApplication.getInstance().addActivity(this);
         ImBarUtils.setBar(this);
         getAndroiodScreenProperty();
         initView();
@@ -105,7 +106,24 @@ public class AmmeterSettingActivity extends Activity implements View.OnClickList
     protected void onRestart() {
         super.onRestart();
         Log.i("TAG", "onRestart: ");
-        nochange=true;
+//        nochange=true;
+        String db_list=sp.getString("db_list","");
+        Log.i("initData: ", db_list);
+        if(db_list.equals("")){
+            //是空
+        }else{
+            String[]dsa=db_list.split(",");
+            if(dsa.length==2){
+                db_num1=dsa[0];
+                db_num2=dsa[1];
+                need_updata1=dsa[0];
+                need_updata2=dsa[1];
+            }else{
+                db_num1=dsa[0];
+                need_updata1=dsa[0];
+            }
+        }
+
     }
 
     @Override
@@ -243,6 +261,7 @@ public class AmmeterSettingActivity extends Activity implements View.OnClickList
                                 }else{
                                     DialogUIUtils.dismiss(edit_dialog);
                                     nochange=false;
+                                    Log.i("onClick: ", "onClick:nochange ");
                                     //执行编辑操作
                                     if(nowmoreid=="1"){
                                         //是第一组数据
@@ -317,6 +336,10 @@ public class AmmeterSettingActivity extends Activity implements View.OnClickList
                                         more1.setVisibility(View.VISIBLE);
                                         more1.setImageResource(R.mipmap.add);
                                         str_review2="1";
+                                        SharedPreferences.Editor editor=sp.edit();
+                                        editor.putString("db_list",need_updata1);
+                                        editor.putString("lastesttime","");
+                                        editor.commit();
                                     }else{
                                         //一组
                                         //如果ll2是显示的就隐藏，同时还原一组的布局
@@ -335,6 +358,10 @@ public class AmmeterSettingActivity extends Activity implements View.OnClickList
                                         next.setBackgroundResource(R.drawable.btn_blue_dark);
                                         cannext=false;
                                         str_review1="1";
+                                        SharedPreferences.Editor editor=sp.edit();
+                                        editor.putString("db_list","");
+                                        editor.putString("lastesttime","");
+                                        editor.commit();
                                     }
                                 }else{
                                     //删除第二组数据
@@ -357,7 +384,10 @@ public class AmmeterSettingActivity extends Activity implements View.OnClickList
                                     more1.setVisibility(View.VISIBLE);
                                     more1.setImageResource(R.mipmap.add);
                                     str_review2="1";
-
+                                    SharedPreferences.Editor editor=sp.edit();
+                                    editor.putString("db_list",need_updata1);
+                                    editor.putString("lastesttime","");
+                                    editor.commit();
                                 }
                             }
                         });
@@ -706,6 +736,7 @@ public class AmmeterSettingActivity extends Activity implements View.OnClickList
                     String date=sdf.format(new java.util.Date());
                     //先进行匹配
                     //匹配通过后，本地记录时间
+                    Log.i("onClick: ", sp.getString("db_list",""));
                     SharedPreferences.Editor editor=sp.edit();
 //                        String db1=need_updata1;
 //                        String db2=need_updata2;

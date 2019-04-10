@@ -146,7 +146,7 @@ public class InputXlhActivity extends Activity {
                         startActivity(intent2);
                     }else{
                         SharedPreferences.Editor editor=sp.edit();
-                        editor.putString("SN","");
+                        editor.putString("SN",et_xlh.getText().toString());
                         editor.putString("db_list","");
                         editor.putString("lastesttime","");
                         editor.commit();

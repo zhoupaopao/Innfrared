@@ -28,6 +28,7 @@ public class SettingFinishSuccessActivity extends Activity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_setting_finish_success);
+        SysApplication.getInstance().addActivity(this);
         ImBarUtils.setBar(this);
         initView();
         initData();

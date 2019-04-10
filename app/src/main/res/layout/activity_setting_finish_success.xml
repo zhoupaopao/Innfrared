@@ -34,16 +34,26 @@
             android:orientation="vertical"
             android:id="@+id/linearLayout">
             <ImageView
+                android:id="@+id/img_status"
                 android:layout_width="@dimen/x130"
                 android:layout_height="@dimen/x200"
                 android:layout_alignTop="@+id/linearLayout"
                 android:layout_centerHorizontal="true"
                 android:src="@mipmap/updata" />
             <TextView
+                android:id="@+id/tv_status"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textColor="@color/black"
                 android:text="@string/data_success"/>
+
+            <TextView
+                android:id="@+id/tv_status2"
+                android:layout_marginTop="@dimen/x5"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                android:text="@string/none_data_msg"/>
 
         </LinearLayout>
 

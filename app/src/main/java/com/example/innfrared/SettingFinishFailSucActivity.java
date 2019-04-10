@@ -34,6 +34,7 @@ public class SettingFinishFailSucActivity extends Activity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settingfinishfailsuc);
+        SysApplication.getInstance().addActivity(this);
         ImBarUtils.setBar(this);
         initView();
         initData();
@@ -90,7 +91,7 @@ public class SettingFinishFailSucActivity extends Activity {
         re_scan.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                finish();
+                SysApplication.getInstance().exit();
             }
         });
         call.setOnClickListener(new View.OnClickListener() {
