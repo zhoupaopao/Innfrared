@@ -9,6 +9,8 @@ import android.content.SharedPreferences;
 import android.graphics.drawable.ColorDrawable;
 import android.net.ParseException;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.annotation.Nullable;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -34,6 +36,7 @@ import com.dou361.dialogui.DialogUIUtils;
 import com.dou361.dialogui.bean.BuildBean;
 import com.dou361.dialogui.listener.DialogUIListener;
 
+import java.io.IOException;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -41,6 +44,9 @@ import java.util.Date;
 import cn.finalteam.okhttpfinal.HttpRequest;
 import cn.finalteam.okhttpfinal.JsonHttpRequestCallback;
 import okhttp3.Headers;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 
 /**
  * Created by Lenovo on 2019/3/29.
@@ -90,6 +96,9 @@ public class AmmeterSettingActivity extends Activity implements View.OnClickList
     private String db_num2="";
     private String device_list="";
     private double pencent=0.0;
+    boolean isyes1=false;//电表1是否成功
+    boolean isyes2=true;//电表2是否成功
+    private Boolean qjbl=false;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -170,42 +179,47 @@ public class AmmeterSettingActivity extends Activity implements View.OnClickList
             next.setBackgroundResource(R.drawable.btn_blue);
             //读取数据
             String db_list=sp.getString("db_list","");
-            Log.i("initData: ", db_list);
-            String[]dsa=db_list.split(",");
-            if(dsa.length==2){
-                db_num1=dsa[0];
-                db_num2=dsa[1];
-                need_updata1=dsa[0];
-                need_updata2=dsa[1];
+            if(db_list.equals("")){
+
             }else{
-                db_num1=dsa[0];
-                need_updata1=dsa[0];
+                Log.i("initData: ", db_list);
+                String[]dsa=db_list.split(",");
+                if(dsa.length==2){
+                    db_num1=dsa[0];
+                    db_num2=dsa[1];
+                    need_updata1=dsa[0];
+                    need_updata2=dsa[1];
+                }else{
+                    db_num1=dsa[0];
+                    need_updata1=dsa[0];
+                }
+                //更改布局
+                tv_add_db.setText("已匹配电表");
+                et_db1.setVisibility(View.GONE);
+                tv_db_num1.setText(need_updata1);
+                tv_db_num1.setVisibility(View.VISIBLE);
+                review1.setImageResource(R.mipmap.more);
+                more1.setVisibility(View.GONE);
+                str_review1="2";
+                if(need_updata2.equals("")){
+                    //隐藏布局2，显示添加按钮
+                    more1.setVisibility(View.VISIBLE);
+                    more1.setImageResource(R.mipmap.add);
+                    ll2.setVisibility(View.GONE);
+                }else{
+                    //显示布局2，
+                    str_review2="2";
+                    et_db2.setVisibility(View.GONE);
+                    tv_db_num2.setText(need_updata2);
+                    tv_db_num2.setVisibility(View.VISIBLE);
+                    review2.setImageResource(R.mipmap.more);
+                    more2.setVisibility(View.GONE);
+                    delete2.setVisibility(View.GONE);
+                    tv_add_db2.setVisibility(View.GONE);
+                    ll2.setVisibility(View.VISIBLE);
+                }
             }
-            //更改布局
-            tv_add_db.setText("已匹配电表");
-            et_db1.setVisibility(View.GONE);
-            tv_db_num1.setText(need_updata1);
-            tv_db_num1.setVisibility(View.VISIBLE);
-            review1.setImageResource(R.mipmap.more);
-            more1.setVisibility(View.GONE);
-            str_review1="2";
-            if(need_updata2.equals("")){
-                //隐藏布局2，显示添加按钮
-                more1.setVisibility(View.VISIBLE);
-                more1.setImageResource(R.mipmap.add);
-                ll2.setVisibility(View.GONE);
-            }else{
-                //显示布局2，
-                str_review2="2";
-                et_db2.setVisibility(View.GONE);
-                tv_db_num2.setText(need_updata2);
-                tv_db_num2.setVisibility(View.VISIBLE);
-                review2.setImageResource(R.mipmap.more);
-                more2.setVisibility(View.GONE);
-                delete2.setVisibility(View.GONE);
-                tv_add_db2.setVisibility(View.GONE);
-                ll2.setVisibility(View.VISIBLE);
-            }
+
         }
     }
 
@@ -536,6 +550,7 @@ public class AmmeterSettingActivity extends Activity implements View.OnClickList
                     }else{
                         //界面发生变化
                         //头变成已匹配电表，edittext隐藏，textview显示，最后一个图标变成...，设置图标属性
+                        nochange=false;
                         tv_add_db.setText("已匹配电表");
                         need_updata1=et_db1.getText().toString();
                         tv_db_num1.setText(et_db1.getText().toString());
@@ -669,12 +684,12 @@ public class AmmeterSettingActivity extends Activity implements View.OnClickList
                     if(nochange){
                         //没有改变，通过时间进入loading和success
                         Log.e(getClass().getName(), "213");
-                        SimpleDateFormat sdf=new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+                        SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
                         String date=sdf.format(new java.util.Date());
                         String lasttime=sp.getString("lastesttime","");
                         //时间差（秒）
                         long longexpand=getTimeExpend(lasttime,date);
-                        if(longexpand>300){
+                        if(longexpand>900){
                             //要么进入配置错误，要么进入配置成功
                             //请求接口查看进入对和错界面或者一对易错
                             String list_dbs=sp.getString("db_list","");
@@ -697,6 +712,7 @@ public class AmmeterSettingActivity extends Activity implements View.OnClickList
                     }else{
                         //先将sn和电表传到后台成功的话就继续
 //                        sn=采集器sn&devuceSn=电表的sn号
+                        Log.e(getClass().getName(), need_updata1);
                         String db1=need_updata1;
                         String db2=need_updata2;
                         saveCommandAmmeter(SN,db1,db2);
@@ -732,7 +748,7 @@ public class AmmeterSettingActivity extends Activity implements View.OnClickList
                 if(jsonObject.getString("result").equals("1")){
                     //成功
                     Intent intent1=new Intent(AmmeterSettingActivity.this,SettingLoadingActivity.class);
-                    SimpleDateFormat sdf=new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+                    SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
                     String date=sdf.format(new java.util.Date());
                     //先进行匹配
                     //匹配通过后，本地记录时间
@@ -769,6 +785,100 @@ public class AmmeterSettingActivity extends Activity implements View.OnClickList
             }
         });
     }
+    Handler handler1 = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+            Bundle data = msg.getData();
+            Boolean val = data.getBoolean("value");
+            Log.i("mylog", "请求结果为-->" + val);
+            // TODO
+            // UI界面的更新等相关操作
+            if(val){
+                //显示数据校验
+                isyes1=val;
+                Log.i("isyes1", "onResponse: ");
+                Intent intent=new Intent(AmmeterSettingActivity.this,SettingFinishSuccessActivity.class);
+                intent.putExtra("device_list",device_list);
+                startActivity(intent);
+            }else{
+                isyes1=val;
+                Log.i("isyes1", "onResponse2: ");
+                Intent intent=new Intent(AmmeterSettingActivity.this,SettingFinishActivity.class);
+                startActivity(intent);
+
+//                        if(longexpand>900){
+//                            Log.i("onResponse: ", "无数据");
+//                            img_status.setImageResource(R.mipmap.none_data);
+//                            tv_status.setText("无数据");
+//                        }else{
+//                            //换图标
+//                            Log.i("onResponse: ", "请耐心等待");
+//                            img_status.setImageResource(R.mipmap.wait);
+//                            tv_status.setText("无数据");
+//                            tv_status2.setText("请耐心等待...");
+//                        }
+
+            }
+        }
+    };
+    /**
+     * 网络操作相关的子线程
+     */
+    Runnable networkTask = new Runnable() {
+
+        @Override
+        public void run() {
+            // TODO
+            final long[] mill = {0};
+            // 在这里进行 http request.网络请求相关操作
+            OkHttpClient okHttpClient=new OkHttpClient();
+            Request request = new Request.Builder()
+                    .url(Api.doDetail +"101260863")
+                    .build();
+            try {
+                Response response = okHttpClient.newCall(request).execute();
+//                Log.i("onResponse22", response.body().string());
+//                Log.i("onResponse2", response.body().string());
+                JSONObject jsonArrayyy= (JSONObject) JSONObject.parse(response.body().string());
+                if(jsonArrayyy.getString("result")=="-1"){
+                    Toast.makeText(AmmeterSettingActivity.this,"请求失败",Toast.LENGTH_SHORT).show();
+                }else{
+                    JSONArray realTimeDataTotal=jsonArrayyy.getJSONObject("DeviceWapper").getJSONArray("realTimeDataTotal");
+                    String updateDate=jsonArrayyy.getJSONObject("DeviceWapper").getString("updateDate");
+                    Log.i("onResponse: ", updateDate);
+                    mill[0] =getTimeMillis(updateDate)+8*60*60*1000;
+                    Log.i("onResponse: ", mill[0]+"");
+                    Date date = new Date(mill[0]);
+                    SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                    String dateee=sdf.format(date);
+                    String datee=sp.getString("lastesttime","");
+                    Log.i("onResponse: ", datee);
+                    Log.i("onResponse: 返回的时间", dateee);
+                    //判断这个时间是否大于点击时间（数据的时间，点击时间）
+                    long longexpand=getTimeExpend(dateee,datee);
+                    Log.i("onResponse: 返回的时间1", longexpand+"");
+                    if(longexpand>0){
+                        //无数据
+                        //老数据
+                        isyes1=false;
+                        //失败的话判断这个时间是否大于15分钟
+                        qjbl =false;
+                    }else{
+                        //有最新数据
+                        qjbl =true;
+                    }
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            Message msg = new Message();
+            Bundle data = new Bundle();
+            data.putBoolean("value",qjbl);
+            msg.setData(data);
+            handler1.sendMessage(msg);
+        }
+    };
     private void checkdb(final String db1, final String db2){
 
         HttpRequest.get(Api.getAmmetersByDatalogerSn +SN, new JsonHttpRequestCallback() {
@@ -798,8 +908,7 @@ public class AmmeterSettingActivity extends Activity implements View.OnClickList
                 super.onResponse(response, headers);
                 Log.i("onClick2: ", response);
                 JSONArray jsonArray=JSONArray.parseArray(response);
-                boolean isyes1=false;//电表1是否成功
-                boolean isyes2=true;//电表2是否成功
+
 
                 dialog.dialog.dismiss();
                 if(db2.equals("")){
@@ -816,24 +925,27 @@ public class AmmeterSettingActivity extends Activity implements View.OnClickList
                             isyes1=true;
                             device_list=jsonArray.getJSONObject(i).getString("deviceId");
                             //切换页面
+                            //查看改数据是否是最新的，比对时间
+//                            isyes1=achieveData(device_list,"1");
+                            new Thread(networkTask).start();
                             Log.i("isyes1: ", "312");
                             break;
                         }
                     }
-                    if(isyes1){
-                        //成功
-                        Log.i("isyes1", "onResponse: ");
-                        Intent intent=new Intent(AmmeterSettingActivity.this,SettingFinishSuccessActivity.class);
-                        intent.putExtra("device_list",device_list);
-                        startActivity(intent);
-//                        finish();
-                    }else{
-                        //失败
-                        Log.i("isyes1", "onResponse2: ");
-                        Intent intent=new Intent(AmmeterSettingActivity.this,SettingFinishActivity.class);
-                        startActivity(intent);
-//                        finish();
-                    }
+//                    if(isyes1){
+//                        //成功
+//                        Log.i("isyes1", "onResponse: ");
+//                        Intent intent=new Intent(AmmeterSettingActivity.this,SettingFinishSuccessActivity.class);
+//                        intent.putExtra("device_list",device_list);
+//                        startActivity(intent);
+////                        finish();
+//                    }else{
+//                        //失败
+//                        Log.i("isyes1", "onResponse2: ");
+//                        Intent intent=new Intent(AmmeterSettingActivity.this,SettingFinishActivity.class);
+//                        startActivity(intent);
+////                        finish();
+//                    }
                 }else{
                     //两个电表
                     isyes1=false;
@@ -843,7 +955,9 @@ public class AmmeterSettingActivity extends Activity implements View.OnClickList
                     for(int i=0;i<jsonArray.size();i++){
                         if(jsonArray.getJSONObject(i).getString("sn").equals(achieve_format(db1))){
                             isyes1=true;
+                            Log.i("isyes1", "isyes1 ");
                             ddd1=jsonArray.getJSONObject(i).getString("deviceId");
+                            isyes1=achieveData(ddd1,"1");
 //                            Log.i("onResponse: ", "1");
 //                            if(device_list.equals("")){
 //                                device_list=jsonArray.getJSONObject(i).getString("deviceId");
@@ -857,7 +971,9 @@ public class AmmeterSettingActivity extends Activity implements View.OnClickList
                     for(int i=0;i<jsonArray.size();i++){
                         if(jsonArray.getJSONObject(i).getString("sn").equals(achieve_format(db2))){
                             isyes2=true;
+                            Log.i("isyes2", "isyes2 ");
                             ddd2=jsonArray.getJSONObject(i).getString("deviceId");
+                            isyes2=achieveData(ddd2,"2");
 //                            Log.i("onResponse: ", "2");
 //                            if(device_list.equals("")){
 //                                device_list=jsonArray.getJSONObject(i).getString("deviceId");
@@ -869,7 +985,7 @@ public class AmmeterSettingActivity extends Activity implements View.OnClickList
                     }
 
 
-                    Log.i("onResponse: ", device_list);
+                    Log.i("onResponse:device_list ", device_list);
                     if(isyes1&&isyes2){
                         //配置成功界面
                         device_list=ddd1+","+ddd2;
@@ -879,6 +995,7 @@ public class AmmeterSettingActivity extends Activity implements View.OnClickList
 //                        finish();
                     }else if((!isyes1)&&(!isyes2)){
                         //配置失败
+                        Log.i("onResponse:fail ", device_list);
                         device_list="";
                         Intent intent=new Intent(AmmeterSettingActivity.this,SettingFinishActivity.class);
                         intent.putExtra("device_list",device_list);
@@ -886,7 +1003,6 @@ public class AmmeterSettingActivity extends Activity implements View.OnClickList
 //                        finish();
                     }else{
                         //一个成功一个失败
-//                        Toast.makeText(AmmeterSettingActivity.this,"一个成功一个失败，页面开发中",Toast.LENGTH_SHORT).show();
                         if(isyes1){
                             device_list=ddd1;
                         }else{
@@ -904,6 +1020,67 @@ public class AmmeterSettingActivity extends Activity implements View.OnClickList
             }
         });
     }
+    private  boolean achieveData(String deviceId, final String index){
+        Log.i("onClick2: ", Api.doDetail +deviceId);
+        final long[] mill = {0};
+        final boolean[] istr = {false};
+        final BuildBean[] dialog = new BuildBean[1];
+        HttpRequest.get(Api.doDetail +deviceId, new JsonHttpRequestCallback() {
+            @Override
+            protected void onSuccess(Headers headers, JSONObject jsonObject) {
+                super.onSuccess(headers, jsonObject);
+                Log.i("onSuccess", jsonObject.toString());
+                dialog[0].dialog.dismiss();
+            }
+            @Override
+            public void onStart () {
+                super.onStart();
+                dialog[0] = DialogUIUtils.showLoading(AmmeterSettingActivity.this, "请求中...", true, true, false, true);
+                dialog[0].show();
+            }
+            @Override
+            public void onFailure ( int errorCode, String msg){
+                super.onFailure(errorCode, msg);
+                dialog[0].dialog.dismiss();
+            }
+
+            @Override
+            public void onResponse(String response, Headers headers) {
+                super.onResponse(response, headers);
+                Log.i("onClick2: ", response);
+//                dialog.dialog.dismiss();
+                JSONObject jsonArrayyy= (JSONObject) JSONObject.parse(response);
+                if(jsonArrayyy.getString("result")=="-1"){
+                    Toast.makeText(AmmeterSettingActivity.this,"请求失败",Toast.LENGTH_SHORT).show();
+                }else{
+                    JSONArray realTimeDataTotal=jsonArrayyy.getJSONObject("DeviceWapper").getJSONArray("realTimeDataTotal");
+                    String updateDate=jsonArrayyy.getJSONObject("DeviceWapper").getString("updateDate");
+                    Log.i("onResponse: ", updateDate);
+                     mill[0] =getTimeMillis(updateDate)+8*60*60*1000;
+                    Date date = new Date(mill[0]);
+                    SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                    String dateee=sdf.format(date);
+                    String datee=sp.getString("lastesttime","");
+                    //判断这个时间是否大于点击时间（数据的时间，点击时间）
+                    long longexpand=getTimeExpend(dateee,datee);
+                    if(longexpand>0){
+                        //无数据
+                        if(index.equals("1")){
+                            isyes1=false;
+                            istr[0] =false;
+                        }else{
+                            isyes2=false;
+                            istr[0] =false;
+                        }
+                    }else{
+                        //有最新数据
+                        istr[0] =true;
+                    }
+                }
+            }
+        });
+        return istr[0];
+    }
     private long getTimeExpend(String startTime, String endTime){
         //传入字串类型 2016/06/28 08:30
         long longStart = getTimeMillis(startTime); //获取开始时间毫秒数
@@ -916,7 +1093,7 @@ public class AmmeterSettingActivity extends Activity implements View.OnClickList
     }
     private long getTimeMillis(String strTime) {
         long returnMillis = 0;
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         Date d = null;
         try {
             d = sdf.parse(strTime);

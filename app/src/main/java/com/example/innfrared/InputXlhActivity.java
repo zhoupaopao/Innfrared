@@ -197,7 +197,7 @@ public class InputXlhActivity extends Activity {
     }
     private long getTimeMillis(String strTime) {
         long returnMillis = 0;
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         Date d = null;
         try {
             d = sdf.parse(strTime);

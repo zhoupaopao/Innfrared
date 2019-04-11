@@ -18,7 +18,6 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.dou361.dialogui.DialogUIUtils;
@@ -35,7 +34,7 @@ import okhttp3.Headers;
  * Created by Lenovo on 2019/4/1.
  */
 
-public class CheckDataActivity extends Activity {
+public class CheckDbDataActivity extends Activity {
     private Button call;
     private Button pass;
     private TextView title;
@@ -61,6 +60,7 @@ public class CheckDataActivity extends Activity {
     private ImageView refresh;
     private TextView updateDate1;
     private TextView updateDate2;
+    private String db_list;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -86,12 +86,14 @@ public class CheckDataActivity extends Activity {
         fxygdn2=findViewById(R.id.fxygdn2);;
         ll1=findViewById(R.id.ll1);
         ll2=findViewById(R.id.ll2);
+        ll2.setVisibility(View.GONE);
         refresh=findViewById(R.id.question);
         refresh.setImageResource(R.mipmap.refresh);
         updateDate1=findViewById(R.id.updateDate1);
         updateDate2=findViewById(R.id.updateDate2);
         sp=getSharedPreferences("Infrared",MODE_PRIVATE);
         device_list=getIntent().getStringExtra("device_list");
+        db_list=getIntent().getStringExtra("db_list");
         isyes1=getIntent().getBooleanExtra("isyes1",true);
         isyes2=getIntent().getBooleanExtra("isyes2",true);
     }
@@ -99,51 +101,11 @@ public class CheckDataActivity extends Activity {
     private void initData() {
         device_list=getIntent().getStringExtra("device_list");
         title.setText("数据验证");
-        String db_list=sp.getString("db_list","");
-        Log.i("initData: ", device_list);
-        String[]dsa=db_list.split(",");
-        String[]lists_dev=device_list.split(",");
+        need_updata1=device_list;
+        tv_db1.setText("正在从电表"+need_updata1+"读取数据");
 
-        if(dsa.length==2){
-            need_updata1=dsa[0];
-            need_updata2=dsa[1];
-            Log.i("initData: ", need_updata1+"|"+need_updata2);
-            if(isyes1){
-                //第一组数据是true
-                tv_db1.setText("正在从电表"+need_updata1+"读取数据");
-                deviceId1=lists_dev[0];
-                achieveData(deviceId1,"1");
-            }else{
-                ll1.setVisibility(View.GONE);
-            }
-            if(isyes2){
-                tv_db2.setText("正在从电表"+need_updata2+"读取数据");
-                if(isyes1){
-                    deviceId2=lists_dev[1];
-                }else{
-                    deviceId2=lists_dev[0];
-                }
-
-                achieveData(deviceId2,"2");
-            }else{
-                ll2.setVisibility(View.GONE);
-            }
-//            ll2.setVisibility(View.VISIBLE);
-//            tv_db1.setText("正在从电表"+need_updata1+"读取数据");
-//            tv_db2.setText("正在从电表"+need_updata2+"读取数据");
-//            deviceId1=lists_dev[0];
-//            deviceId2=lists_dev[1];
-//            achieveData(deviceId1,"1");
-//            achieveData(deviceId2,"2");
-        }else{
-            need_updata1=dsa[0];
-            tv_db1.setText("正在从电表"+need_updata1+"读取数据");
-            deviceId1=lists_dev[0];
-            achieveData(deviceId1,"1");
-            ll2.setVisibility(View.GONE);
-        }
         //请求数据
-
+        achieveData(db_list,"1");
     }
     private void refresh(){
         initData();
@@ -156,7 +118,7 @@ public class CheckDataActivity extends Activity {
             d = sdf.parse(strTime);
             returnMillis = d.getTime();
         } catch (ParseException e) {
-            Toast.makeText(CheckDataActivity.this, e.toString(), Toast.LENGTH_SHORT).show();
+            Toast.makeText(CheckDbDataActivity.this, e.toString(), Toast.LENGTH_SHORT).show();
         } catch (java.text.ParseException e) {
             e.printStackTrace();
         }
@@ -186,7 +148,7 @@ public class CheckDataActivity extends Activity {
             @Override
             public void onStart () {
                 super.onStart();
-                dialog[0] = DialogUIUtils.showLoading(CheckDataActivity.this, "请求中...", true, true, false, true);
+                dialog[0] = DialogUIUtils.showLoading(CheckDbDataActivity.this, "请求中...", true, true, false, true);
                 dialog[0].show();
             }
             @Override
@@ -203,7 +165,7 @@ public class CheckDataActivity extends Activity {
 //                dialog.dialog.dismiss();
                 JSONObject jsonArrayyy= (JSONObject) JSONObject.parse(response);
                 if(jsonArrayyy.getString("result")=="-1"){
-                    Toast.makeText(CheckDataActivity.this,"请求失败",Toast.LENGTH_SHORT).show();
+                    Toast.makeText(CheckDbDataActivity.this,"请求失败",Toast.LENGTH_SHORT).show();
                 }else{
                     JSONArray realTimeDataTotal=jsonArrayyy.getJSONObject("DeviceWapper").getJSONArray("realTimeDataTotal");
                     JSONObject dataJSON=jsonArrayyy.getJSONObject("DeviceWapper").getJSONObject("dataJSON");
@@ -260,7 +222,7 @@ public class CheckDataActivity extends Activity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(Intent.ACTION_DIAL);
-                String mobile=(String) CheckDataActivity.this.getResources().getText(R.string.num_mobile);
+                String mobile=(String) CheckDbDataActivity.this.getResources().getText(R.string.num_mobile);
                 Uri data = Uri.parse("tel:" + mobile);
                 intent.setData(data);
                 startActivity(intent);
@@ -282,10 +244,10 @@ public class CheckDataActivity extends Activity {
         review.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                View rootView1 = View.inflate(CheckDataActivity.this, R.layout.pop_review, null);
+                View rootView1 = View.inflate(CheckDbDataActivity.this, R.layout.pop_review, null);
                 ImageView iv_pop=rootView1.findViewById(R.id.iv_pop);
                 iv_pop.setImageResource(R.mipmap.check_review);
-                final Dialog dialog1 = DialogUIUtils.showCustomAlert(CheckDataActivity.this, rootView1, Gravity.CENTER, true, false).show();
+                final Dialog dialog1 = DialogUIUtils.showCustomAlert(CheckDbDataActivity.this, rootView1, Gravity.CENTER, true, false).show();
                 //设置弹出框透明
                 dialog1.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
                 rootView1.findViewById(R.id.close).setOnClickListener(new View.OnClickListener() {

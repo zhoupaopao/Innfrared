@@ -41,7 +41,7 @@
     <string name="setting_fail">配置未完成</string>
     <string name="setting_success">配置完成</string>
     <string name="setting_db">配置电表</string>
-    <string name="five_loading">数据约5分钟后上传,请耐心等待</string>
+    <string name="five_loading">数据上传,请耐心等待</string>
     <string name="none_data">无数据</string>
     <string name="data_success">数据上传成功</string>
     <string name="none_data_msg">请确认电表编号与安装位置是否准确</string>
@@ -49,7 +49,7 @@
     <string name="know">我知道了</string>
     <string name="pleasecheck">请务必校验正向有功总电能是否准确</string>
     <string name="zxygdn">正向有功总电能</string>
-    <string name="fxygdn">反向有功总电能</string>
+    <string name="fxygdn">组合有功总电能</string>
     <string name="Axygdn">A向正向有功电能</string>
     <string name="Bxygdn">B正向有功电能</string>
     <string name="Cxygdn">C正向有功电能</string>
