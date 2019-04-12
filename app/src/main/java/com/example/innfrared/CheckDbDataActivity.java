@@ -6,9 +6,11 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.ParseException;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
+import android.support.annotation.RequiresApi;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
@@ -22,6 +24,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.dou361.dialogui.DialogUIUtils;
 import com.dou361.dialogui.bean.BuildBean;
+import com.example.innfrared.SettingPage.CheckFinishActivity;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -229,10 +232,16 @@ public class CheckDbDataActivity extends Activity {
             }
         });
         pass.setOnClickListener(new View.OnClickListener() {
+            @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
             @Override
             public void onClick(View v) {
                 //按理退回到扫描界面
-                SysApplication.getInstance().exit();
+//                SysApplication.getInstance().exit();
+//                finishAffinity();
+//                System.exit(0);
+                Intent intent=new Intent();
+                intent.setClass(CheckDbDataActivity.this, CheckFinishActivity.class);
+                startActivity(intent);
             }
         });
         back.setOnClickListener(new View.OnClickListener() {

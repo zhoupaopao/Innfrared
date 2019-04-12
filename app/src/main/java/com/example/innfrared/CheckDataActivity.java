@@ -23,6 +23,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.dou361.dialogui.DialogUIUtils;
 import com.dou361.dialogui.bean.BuildBean;
+import com.example.innfrared.SettingPage.CheckFinishActivity;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -270,7 +271,10 @@ public class CheckDataActivity extends Activity {
             @Override
             public void onClick(View v) {
                 //按理退回到扫描界面
-                SysApplication.getInstance().exit();
+//                SysApplication.getInstance().exit();
+                Intent intent=new Intent();
+                intent.setClass(CheckDataActivity.this, CheckFinishActivity.class);
+                startActivity(intent);
             }
         });
         back.setOnClickListener(new View.OnClickListener() {

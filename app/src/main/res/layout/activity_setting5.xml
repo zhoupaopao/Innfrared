@@ -54,6 +54,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:paddingTop="@dimen/x10"
+                    android:textSize="@dimen/x16"
+                    android:textColor="@color/black"
                     android:text="延长布线请按照现场情况选择桥架或者地板下走线"/>
             </LinearLayout>
 

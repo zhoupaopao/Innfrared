@@ -46,6 +46,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:paddingTop="@dimen/x10"
+                    android:textSize="@dimen/x16"
+                    android:textColor="@color/black"
                     android:text="将红外抄表装置的红外接口正对电表红外接口寻找合适的固定位置，距离不得超过5米，偏移角度不得超过15°"/>
             </LinearLayout>
 
@@ -76,6 +78,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:paddingTop="@dimen/x10"
+                    android:textSize="@dimen/x16"
+                    android:textColor="@color/black"
                     android:text="标配3M泡棉贴，可贴在红外抄表装置正面或者背面，用于柜外或者柜内安装"/>
             </LinearLayout>
 
@@ -99,6 +103,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:paddingTop="@dimen/x10"
+                    android:textSize="@dimen/x16"
+                    android:textColor="@color/black"
                     android:text="标配内置磁铁，可吸附在铁质柜门上"/>
             </LinearLayout>
         </LinearLayout>

@@ -24,6 +24,7 @@ public class SettingFinishSuccessActivity extends Activity {
     private TextView tv_db1;
     private TextView tv_db2;
     private String device_list="";
+    private TextView tv_status;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -37,6 +38,8 @@ public class SettingFinishSuccessActivity extends Activity {
 
     private void initView() {
         next=findViewById(R.id.next);
+        tv_status=findViewById(R.id.tv_status);
+        tv_status.setText("数据上传成功");
         sp=getSharedPreferences("Infrared",MODE_PRIVATE);
         back=findViewById(R.id.back);
         tv_db1=findViewById(R.id.tv_db1);
@@ -48,6 +51,7 @@ public class SettingFinishSuccessActivity extends Activity {
         String db_list=sp.getString("db_list","");
         Log.i("initData: ", db_list);
         String[]dsa=db_list.split(",");
+
         if(dsa.length==2){
             need_updata1=dsa[0];
             need_updata2=dsa[1];

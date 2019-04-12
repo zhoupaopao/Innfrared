@@ -50,6 +50,7 @@
         <activity android:name=".SettingFinishSuccessDetailActivity"/>
         <activity android:name=".SettingFinishFailSucActivity"/>
         <activity android:name=".CheckDbDataActivity"/>
+        <activity android:name=".SettingPage.CheckFinishActivity"/>
     </application>
 
 </manifest>

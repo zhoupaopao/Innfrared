@@ -314,7 +314,7 @@ public class SettingFinishSuccessDetailActivity extends Activity {
                 JSONObject jsonArrayyy= (JSONObject) JSONObject.parse(response.body().string());
                 Log.i("onResponse2", jsonArrayyy.toString());
                 if(jsonArrayyy.getString("result")=="-1"){
-                    Toast.makeText(SettingFinishSuccessDetailActivity.this,"请求失败",Toast.LENGTH_SHORT).show();
+//                    Toast.makeText(SettingFinishSuccessDetailActivity.this,"请求失败",Toast.LENGTH_SHORT).show();
                 }else{
                     JSONArray realTimeDataTotal=jsonArrayyy.getJSONObject("DeviceWapper").getJSONArray("realTimeDataTotal");
                     String updateDate=jsonArrayyy.getJSONObject("DeviceWapper").getString("updateDate");

@@ -47,6 +47,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:paddingTop="@dimen/x10"
+                    android:textSize="@dimen/x16"
+                    android:textColor="@color/black"
                     android:text="上电并查看电表屏幕，若屏幕背光点亮，则红外通信成功"/>
             </LinearLayout>
 

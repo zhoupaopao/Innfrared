@@ -47,6 +47,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:paddingTop="@dimen/x10"
+                    android:textSize="@dimen/x16"
+                    android:textColor="@color/black"
                     android:text="确认电能表能否有红外接口"/>
             </LinearLayout>
 

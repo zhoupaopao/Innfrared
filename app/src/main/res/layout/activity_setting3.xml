@@ -46,6 +46,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:paddingTop="@dimen/x10"
+                    android:textSize="@dimen/x16"
+                    android:textColor="@color/black"
                     android:text="导轨采集器连接一台红外抄表装置抄读单台电表走线距离不超过2m，无需进行延长接线"/>
             </LinearLayout>
 
@@ -69,6 +71,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:paddingTop="@dimen/x10"
+                    android:textSize="@dimen/x16"
+                    android:textColor="@color/black"
                     android:text="走线距离超过2m，需进行延长接线"/>
             </LinearLayout>
 

@@ -47,6 +47,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:paddingTop="@dimen/x10"
+                    android:textSize="@dimen/x16"
+                    android:textColor="@color/black"
                     android:text="根据现场情况，查看配电柜柜门是否可以打开，若柜门可以打开，将设备安装在配电柜内，可从配电柜内取220V交流电，如图"/>
             </LinearLayout>
 
@@ -70,6 +72,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:paddingTop="@dimen/x10"
+                    android:textSize="@dimen/x16"
+                    android:textColor="@color/black"
                     android:text="若配电柜门有铅封无法打开，则需进行墙挂安装设备，并寻找合适的交流电取电点拉线至导轨电源模块，如图"/>
             </LinearLayout>
 
