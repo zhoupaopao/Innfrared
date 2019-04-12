@@ -99,6 +99,7 @@ public class AmmeterSettingActivity extends Activity implements View.OnClickList
     boolean isyes1=false;//电表1是否成功
     boolean isyes2=true;//电表2是否成功
     private Boolean qjbl=false;
+    private String nowdevice_id1="";
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -635,6 +636,7 @@ public class AmmeterSettingActivity extends Activity implements View.OnClickList
                 //之后这个界面就不需要来了
                 //判断是否有数据
                 if(cannext){
+
                     //请求数据，将SN号上传，获取电表deviceid
 
                     //不需要请求这个接口
@@ -761,6 +763,7 @@ public class AmmeterSettingActivity extends Activity implements View.OnClickList
                     editor.putString("SN",SN);
                     editor.putString("db_list",db1+","+db2);
                     editor.putString("lastesttime",date);
+//                    editor.putString("lastesttime","2019-04-12 10:46:15");
                     editor.commit();
                     startActivity(intent1);
 //                    finish();
@@ -910,7 +913,7 @@ public class AmmeterSettingActivity extends Activity implements View.OnClickList
                 JSONArray jsonArray=JSONArray.parseArray(response);
 
 
-                dialog.dialog.dismiss();
+
                 if(db2.equals("")){
                     //只有一个电表
                     for(int i=0;i<jsonArray.size();i++){
@@ -931,7 +934,17 @@ public class AmmeterSettingActivity extends Activity implements View.OnClickList
                             Log.i("isyes1: ", "312");
                             break;
                         }
+                        if (i==jsonArray.size()-1){
+                            //没有匹配到
+                            //失败
+//                                    Log.i("isyes1", "onResponse2: ");
+                            Intent intent=new Intent(AmmeterSettingActivity.this,SettingFinishActivity.class);
+                            intent.putExtra("device_list",device_list);
+                            startActivity(intent);
+                            finish();
+                        }
                     }
+                    dialog.dialog.dismiss();
 //                    if(isyes1){
 //                        //成功
 //                        Log.i("isyes1", "onResponse: ");
@@ -957,7 +970,16 @@ public class AmmeterSettingActivity extends Activity implements View.OnClickList
                             isyes1=true;
                             Log.i("isyes1", "isyes1 ");
                             ddd1=jsonArray.getJSONObject(i).getString("deviceId");
-                            isyes1=achieveData(ddd1,"1");
+//                            isyes1=achieveData(ddd1,"1");
+                            nowdevice_id1=ddd1;
+                            Thread tt1=new Thread(networkTask1);
+                            tt1.start();
+                            try {
+                                tt1.join();
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
+                            isyes1=qjbl;
 //                            Log.i("onResponse: ", "1");
 //                            if(device_list.equals("")){
 //                                device_list=jsonArray.getJSONObject(i).getString("deviceId");
@@ -973,7 +995,16 @@ public class AmmeterSettingActivity extends Activity implements View.OnClickList
                             isyes2=true;
                             Log.i("isyes2", "isyes2 ");
                             ddd2=jsonArray.getJSONObject(i).getString("deviceId");
-                            isyes2=achieveData(ddd2,"2");
+//                            isyes2=achieveData(ddd2,"2");
+                            nowdevice_id1=ddd2;
+                            Thread tt1=new Thread(networkTask1);
+                            tt1.start();
+                            try {
+                                tt1.join();
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
+                            isyes2=qjbl;
 //                            Log.i("onResponse: ", "2");
 //                            if(device_list.equals("")){
 //                                device_list=jsonArray.getJSONObject(i).getString("deviceId");
@@ -986,6 +1017,7 @@ public class AmmeterSettingActivity extends Activity implements View.OnClickList
 
 
                     Log.i("onResponse:device_list ", device_list);
+                    dialog.dialog.dismiss();
                     if(isyes1&&isyes2){
                         //配置成功界面
                         device_list=ddd1+","+ddd2;
@@ -1020,6 +1052,82 @@ public class AmmeterSettingActivity extends Activity implements View.OnClickList
             }
         });
     }
+    Runnable networkTask1 = new Runnable() {
+
+        @Override
+        public void run() {
+            // TODO
+            final long[] mill = {0};
+            Log.i("onResponse2", Api.doDetail +nowdevice_id1);
+//            SyncHttpClient client=new SyncHttpClient();
+////                AsyncHttpClient client=new AsyncHttpClient();
+//            com.loopj.android.http.RequestParams params=new com.loopj.android.http.RequestParams();
+//            client.post(Api.doDetail +nowdevice_id1, params, new AsyncHttpResponseHandler() {
+//                @Override
+//                public void onSuccess(int i, Header[] headers, byte[] bytes) {
+//                    try {
+//                        String json=new String(bytes,"UTF-8").toString().trim();
+//                        Log.i("onResponse2", json.toString());
+//                    } catch (UnsupportedEncodingException e) {
+//                        e.printStackTrace();
+//                    }
+//
+//                }
+//
+//
+//                @Override
+//                public void onFailure(int i, Header[] headers, byte[] bytes, Throwable throwable) {
+//
+//                }
+//            });
+            // 在这里进行 http request.网络请求相关操作
+            OkHttpClient okHttpClient=new OkHttpClient();
+            Log.i("onResponse2", Api.doDetail +nowdevice_id1);
+            Request request = new Request.Builder()
+                    .url(Api.doDetail +nowdevice_id1)
+                    .build();
+            try {
+                Response response = okHttpClient.newCall(request).execute();
+                JSONObject jsonArrayyy= (JSONObject) JSONObject.parse(response.body().string());
+                Log.i("onResponse22", jsonArrayyy.toString());
+                if(jsonArrayyy.getInteger("result")==-1){
+//                    Toast.makeText(SettingLoadingActivity.this,"请求失败",Toast.LENGTH_SHORT).show();
+                }else{
+                    JSONArray realTimeDataTotal=jsonArrayyy.getJSONObject("DeviceWapper").getJSONArray("realTimeDataTotal");
+                    String updateDate=jsonArrayyy.getJSONObject("DeviceWapper").getString("updateDate");
+                    Log.i("onResponse: ", updateDate);
+                    mill[0] =getTimeMillis(updateDate)+8*60*60*1000;
+                    Log.i("onResponse: ", mill[0]+"");
+                    Date date = new Date(mill[0]);
+                    SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                    String dateee=sdf.format(date);
+                    String datee=sp.getString("lastesttime","");
+                    Log.i("onResponse: ", datee);
+                    Log.i("onResponse: 返回的时间", dateee);
+                    //判断这个时间是否大于点击时间（数据的时间，点击时间）
+                    long longexpand=getTimeExpend(dateee,datee);
+                    Log.i("onResponse: 返回的时间1", longexpand+"");
+                    if(longexpand>0){
+                        //无数据
+                        //老数据
+                        isyes1=false;
+                        //失败的话判断这个时间是否大于15分钟
+                        qjbl =false;
+                    }else{
+                        //有最新数据
+                        qjbl =true;
+                    }
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+//            Message msg = new Message();
+//            Bundle data = new Bundle();
+//            data.putBoolean("value",qjbl);
+//            msg.setData(data);
+//            handler2.sendMessage(msg);
+        }
+    };
     private  boolean achieveData(String deviceId, final String index){
         Log.i("onClick2: ", Api.doDetail +deviceId);
         final long[] mill = {0};

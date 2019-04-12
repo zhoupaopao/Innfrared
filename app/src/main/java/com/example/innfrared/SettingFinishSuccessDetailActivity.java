@@ -56,6 +56,8 @@ public class SettingFinishSuccessDetailActivity extends Activity {
     private String db_devid="";
     private Boolean qjbl=false;
     private String device_list="";
+//    final BuildBean[] dialog = new BuildBean[1];
+    private BuildBean dialog;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -109,7 +111,7 @@ public class SettingFinishSuccessDetailActivity extends Activity {
         });
     }
     private void checkdb(final String db1){
-        final BuildBean[] dialog = new BuildBean[1];
+
         Log.i("onResponse", Api.getAmmetersByDatalogerSn +sn);
         HttpRequest.get(Api.getAmmetersByDatalogerSn +sn, new JsonHttpRequestCallback() {
             @Override
@@ -117,20 +119,20 @@ public class SettingFinishSuccessDetailActivity extends Activity {
                 super.onSuccess(headers, jsonObject);
                 Log.i("onSuccess", jsonObject.toString());
 
-                dialog[0].dialog.dismiss();
+//                dialog[0].dialog.dismiss();
 
             }
             @Override
             public void onStart () {
                 super.onStart();
-                dialog[0] = DialogUIUtils.showLoading(SettingFinishSuccessDetailActivity.this, "请求中...", true, true, false, true);
-                dialog[0].show();
+                dialog = DialogUIUtils.showLoading(SettingFinishSuccessDetailActivity.this, "请求中...", true, true, false, true);
+                dialog.show();
             }
             @Override
             public void onFailure ( int errorCode, String msg){
                 super.onFailure(errorCode, msg);
 //                                Toast.makeText(AmmeterSettingActivity.this,"采集器下没有电表",Toast.LENGTH_SHORT).show();
-                dialog[0].dialog.dismiss();
+//                dialog.dialog.dismiss();
             }
 
             @Override
@@ -146,19 +148,20 @@ public class SettingFinishSuccessDetailActivity extends Activity {
                 //时间差（秒）
                 long longexpand=getTimeExpend(lasttime,date);
                 tv_status2.setVisibility(View.VISIBLE);
-                if(longexpand>900){
-                    //超过15分钟了还没数据
-
-                    img_status.setImageResource(R.mipmap.none_data);
-                    tv_status.setText("无数据");
-                    tv_status2.setVisibility(View.GONE);
-                }else{
-                    //没有超过时间
-                    img_status.setImageResource(R.mipmap.wait);
-                    tv_status.setText("无数据");
-                    tv_status2.setText("请耐心等待...");
-                }
-                dialog[0].dialog.dismiss();
+                //这里现在肯定有返回
+//                if(longexpand>900){
+//                    //超过15分钟了还没数据
+//
+//                    img_status.setImageResource(R.mipmap.none_data);
+//                    tv_status.setText("无数据");
+//                    tv_status2.setVisibility(View.GONE);
+//                }else{
+//                    //没有超过时间
+//                    img_status.setImageResource(R.mipmap.wait);
+//                    tv_status.setText("无数据");
+//                    tv_status2.setText("请耐心等待...");
+//                }
+//                dialog[0].dialog.dismiss();
                 String ddd1="";
                     //只有一个电表
                     for(int i=0;i<jsonArray.size();i++){
@@ -176,6 +179,23 @@ public class SettingFinishSuccessDetailActivity extends Activity {
                             device_list=ddd1;
                             new Thread(networkTask).start();
                             break;
+                        }
+                        Log.i("onResponse: jsonArray", i+"|"+jsonArray.size());
+                        if(i==jsonArray.size()-1){
+                            if(longexpand>900){
+                    //超过15分钟了还没数据
+
+                    img_status.setImageResource(R.mipmap.none_data);
+                    tv_status.setText("无数据");
+                    tv_status2.setVisibility(View.GONE);
+                }else{
+                    //没有超过时间
+                    img_status.setImageResource(R.mipmap.wait);
+                    tv_status.setText("无数据");
+                    tv_status2.setVisibility(View.VISIBLE);
+                    tv_status2.setText("请耐心等待...");
+                     }
+                     dialog.dialog.dismiss();
                         }
                     }
 
@@ -259,6 +279,17 @@ public class SettingFinishSuccessDetailActivity extends Activity {
 //                        }
 
             }
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        Thread.sleep(1500);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }).start();
+            dialog.dialog.dismiss();
         }
     };
     /**
@@ -272,6 +303,7 @@ public class SettingFinishSuccessDetailActivity extends Activity {
             final long[] mill = {0};
             // 在这里进行 http request.网络请求相关操作
             OkHttpClient okHttpClient=new OkHttpClient();
+            Log.i("onResponse2", Api.doDetail +device_list);
             Request request = new Request.Builder()
                     .url(Api.doDetail +device_list)
                     .build();
@@ -280,6 +312,7 @@ public class SettingFinishSuccessDetailActivity extends Activity {
 //                Log.i("onResponse22", response.body().string());
 //                Log.i("onResponse2", response.body().string());
                 JSONObject jsonArrayyy= (JSONObject) JSONObject.parse(response.body().string());
+                Log.i("onResponse2", jsonArrayyy.toString());
                 if(jsonArrayyy.getString("result")=="-1"){
                     Toast.makeText(SettingFinishSuccessDetailActivity.this,"请求失败",Toast.LENGTH_SHORT).show();
                 }else{
