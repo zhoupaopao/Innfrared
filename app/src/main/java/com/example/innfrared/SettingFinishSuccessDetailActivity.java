@@ -46,18 +46,19 @@ public class SettingFinishSuccessDetailActivity extends Activity {
     private String need_updata2;
     private TextView tv_db1;
     private TextView tv_db2;
-    private String db_num="";
-    private String sn="";
+    private String db_num = "";
+    private String sn = "";
     private SharedPreferences sp;
     private TextView tv_status;
     private TextView tv_status2;
     private ImageView img_status;
-    boolean isyes1=false;//电表1是否成功
-    private String db_devid="";
-    private Boolean qjbl=false;
-    private String device_list="";
-//    final BuildBean[] dialog = new BuildBean[1];
+    boolean isyes1 = false;//电表1是否成功
+    private String db_devid = "";
+    private Boolean qjbl = false;
+    private String device_list = "";
+    //    final BuildBean[] dialog = new BuildBean[1];
     private BuildBean dialog;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -70,21 +71,21 @@ public class SettingFinishSuccessDetailActivity extends Activity {
     }
 
     private void initView() {
-        next=findViewById(R.id.next);
-        back=findViewById(R.id.back);
-        tv_db1=findViewById(R.id.tv_db1);
-        tv_db2=findViewById(R.id.tv_db2);
-        tv_status=findViewById(R.id.tv_status);
-        tv_status2=findViewById(R.id.tv_status2);
-        img_status=findViewById(R.id.img_status);
-        sp=getSharedPreferences("Infrared",MODE_PRIVATE);
+        next = findViewById(R.id.next);
+        back = findViewById(R.id.back);
+        tv_db1 = findViewById(R.id.tv_db1);
+        tv_db2 = findViewById(R.id.tv_db2);
+        tv_status = findViewById(R.id.tv_status);
+        tv_status2 = findViewById(R.id.tv_status2);
+        img_status = findViewById(R.id.img_status);
+        sp = getSharedPreferences("Infrared", MODE_PRIVATE);
     }
 
     private void initData() {
         next.setText("我知道了");
-        db_num=getIntent().getStringExtra("db_num");
-        tv_db1.setText("数据来源为电表： "+db_num);
-        sn=sp.getString("SN","");
+        db_num = getIntent().getStringExtra("db_num");
+        tv_db1.setText("数据来源为电表： " + db_num);
+        sn = sp.getString("SN", "");
         checkdb(db_num);
     }
 
@@ -92,12 +93,12 @@ public class SettingFinishSuccessDetailActivity extends Activity {
         next.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(isyes1){
-                    Intent intent=new Intent(SettingFinishSuccessDetailActivity.this,CheckDbDataActivity.class);
-                    intent.putExtra("device_list",db_num);
-                    intent.putExtra("db_list",db_devid);
+                if (isyes1) {
+                    Intent intent = new Intent(SettingFinishSuccessDetailActivity.this, CheckDbDataActivity.class);
+                    intent.putExtra("device_list", db_num);
+                    intent.putExtra("db_list", db_devid);
                     startActivity(intent);
-                }else{
+                } else {
                     finish();
                 }
 
@@ -110,10 +111,11 @@ public class SettingFinishSuccessDetailActivity extends Activity {
             }
         });
     }
-    private void checkdb(final String db1){
 
-        Log.i("onResponse", Api.getAmmetersByDatalogerSn +sn);
-        HttpRequest.get(Api.getAmmetersByDatalogerSn +sn, new JsonHttpRequestCallback() {
+    private void checkdb(final String db1) {
+
+        Log.i("onResponse", Api.getAmmetersByDatalogerSn + sn);
+        HttpRequest.get(Api.getAmmetersByDatalogerSn + sn, new JsonHttpRequestCallback() {
             @Override
             protected void onSuccess(Headers headers, JSONObject jsonObject) {
                 super.onSuccess(headers, jsonObject);
@@ -122,14 +124,16 @@ public class SettingFinishSuccessDetailActivity extends Activity {
 //                dialog[0].dialog.dismiss();
 
             }
+
             @Override
-            public void onStart () {
+            public void onStart() {
                 super.onStart();
                 dialog = DialogUIUtils.showLoading(SettingFinishSuccessDetailActivity.this, "请求中...", true, true, false, true);
                 dialog.show();
             }
+
             @Override
-            public void onFailure ( int errorCode, String msg){
+            public void onFailure(int errorCode, String msg) {
                 super.onFailure(errorCode, msg);
 //                                Toast.makeText(AmmeterSettingActivity.this,"采集器下没有电表",Toast.LENGTH_SHORT).show();
 //                dialog.dialog.dismiss();
@@ -139,65 +143,52 @@ public class SettingFinishSuccessDetailActivity extends Activity {
             public void onResponse(String response, Headers headers) {
                 super.onResponse(response, headers);
                 Log.i("onClick2: ", response);
-                JSONArray jsonArray=JSONArray.parseArray(response);
+                JSONArray jsonArray = JSONArray.parseArray(response);
 //失败
                 //判断当前时间和记录时间
-                SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-                String date=sdf.format(new java.util.Date());
-                String lasttime=sp.getString("lastesttime","");
+                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                String date = sdf.format(new java.util.Date());
+                String lasttime = sp.getString("lastesttime", "");
                 //时间差（秒）
-                long longexpand=getTimeExpend(lasttime,date);
+                long longexpand = getTimeExpend(lasttime, date);
                 tv_status2.setVisibility(View.VISIBLE);
                 //这里现在肯定有返回
-//                if(longexpand>900){
-//                    //超过15分钟了还没数据
-//
-//                    img_status.setImageResource(R.mipmap.none_data);
-//                    tv_status.setText("无数据");
-//                    tv_status2.setVisibility(View.GONE);
-//                }else{
-//                    //没有超过时间
-//                    img_status.setImageResource(R.mipmap.wait);
-//                    tv_status.setText("无数据");
-//                    tv_status2.setText("请耐心等待...");
-//                }
-//                dialog[0].dialog.dismiss();
-                String ddd1="";
-                    //只有一个电表
-                    for(int i=0;i<jsonArray.size();i++){
-                        String ssn=jsonArray.getJSONObject(i).getString("sn");
-                        String ddb1=achieve_format(db1).toString();
+                String ddd1 = "";
+                //只有一个电表
+                for (int i = 0; i < jsonArray.size(); i++) {
+                    String ssn = jsonArray.getJSONObject(i).getString("sn");
+                    String ddb1 = achieve_format(db1).toString();
 
 
-                        if(ssn.contains(ddb1)){
-                            ddd1=jsonArray.getJSONObject(i).getString("deviceId");
-                            isyes1=true;
-                            db_devid=ddd1;
-                            Log.i("onResponse: db_devid", ssn);
-                            Log.i("onResponse: db_devid", ddb1);
+                    if (ssn.contains(ddb1)) {
+                        ddd1 = jsonArray.getJSONObject(i).getString("deviceId");
+                        isyes1 = true;
+                        db_devid = ddd1;
+                        Log.i("onResponse: db_devid", ssn);
+                        Log.i("onResponse: db_devid", ddb1);
 //                                isyes1=achieveData(ddd1);
-                            device_list=ddd1;
-                            new Thread(networkTask).start();
-                            break;
-                        }
-                        Log.i("onResponse: jsonArray", i+"|"+jsonArray.size());
-                        if(i==jsonArray.size()-1){
-                            if(longexpand>900){
-                    //超过15分钟了还没数据
-
-                    img_status.setImageResource(R.mipmap.none_data);
-                    tv_status.setText("无数据");
-                    tv_status2.setVisibility(View.GONE);
-                }else{
-                    //没有超过时间
-                    img_status.setImageResource(R.mipmap.wait);
-                    tv_status.setText("无数据");
-                    tv_status2.setVisibility(View.VISIBLE);
-                    tv_status2.setText("请耐心等待...");
-                     }
-                     dialog.dialog.dismiss();
-                        }
+                        device_list = ddd1;
+                        new Thread(networkTask).start();
+                        break;
                     }
+                    Log.i("onResponse: jsonArray", i + "|" + jsonArray.size());
+                    if (i == jsonArray.size() - 1) {
+                        if (longexpand > 900) {
+                            //超过15分钟了还没数据
+
+                            img_status.setImageResource(R.mipmap.none_data);
+                            tv_status.setText("无数据");
+                            tv_status2.setVisibility(View.GONE);
+                        } else {
+                            //没有超过时间
+                            img_status.setImageResource(R.mipmap.wait);
+                            tv_status.setText("无数据");
+                            tv_status2.setVisibility(View.VISIBLE);
+                            tv_status2.setText("请耐心等待...");
+                        }
+                        dialog.dialog.dismiss();
+                    }
+                }
 
 
 //                        if(longexpand>900){
@@ -215,20 +206,22 @@ public class SettingFinishSuccessDetailActivity extends Activity {
             }
         });
     }
-    //自动补全12位，同时按照要求从后到前每隔2位重组
-    private String achieve_format(String updata1){
-        String las_sub="";
-        DecimalFormat df=new DecimalFormat("000000000000");
-        String str2=df.format(Long.parseLong(updata1));
 
-        for(int i=0;i<6;i++){
-            String sub_str=str2.substring(12-i*2-2, 12-i*2);
-            las_sub=las_sub+sub_str;
+    //自动补全12位，同时按照要求从后到前每隔2位重组
+    private String achieve_format(String updata1) {
+        String las_sub = "";
+        DecimalFormat df = new DecimalFormat("00000000000000");
+        String str2 = df.format(Long.parseLong(updata1));
+        str2 = str2.substring(2, 14);
+        for (int i = 0; i < 6; i++) {
+            String sub_str = str2.substring(12 - i * 2 - 2, 12 - i * 2);
+            las_sub = las_sub + sub_str;
         }
 //        Log.i("AmmeterSettingActivity", "onClick: "+las_sub);
 //        Log.i("AmmeterSettingActivity", "onClick: "+str2);
         return las_sub;
     }
+
     Handler handler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
@@ -238,29 +231,29 @@ public class SettingFinishSuccessDetailActivity extends Activity {
             Log.i("mylog", "请求结果为-->" + val);
             // TODO
             // UI界面的更新等相关操作
-            if(val){
+            if (val) {
                 //显示数据校验
                 next.setText("数据校验");
                 img_status.setImageResource(R.mipmap.updata);
                 tv_status.setText("数据上传成功");
                 tv_status2.setVisibility(View.GONE);
-            }else{
+            } else {
                 next.setText("我知道了");
                 //失败
                 //判断当前时间和记录时间
-                SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-                String date=sdf.format(new java.util.Date());
-                String lasttime=sp.getString("lastesttime","");
+                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                String date = sdf.format(new java.util.Date());
+                String lasttime = sp.getString("lastesttime", "");
                 //时间差（秒）
-                long longexpand=getTimeExpend(lasttime,date);
+                long longexpand = getTimeExpend(lasttime, date);
                 tv_status2.setVisibility(View.VISIBLE);
-                if(longexpand>900){
+                if (longexpand > 900) {
                     //超过15分钟了还没数据
 
                     img_status.setImageResource(R.mipmap.none_data);
                     tv_status.setText("无数据");
                     tv_status2.setVisibility(View.GONE);
-                }else{
+                } else {
                     //没有超过时间
                     img_status.setImageResource(R.mipmap.wait);
                     tv_status.setText("无数据");
@@ -302,43 +295,43 @@ public class SettingFinishSuccessDetailActivity extends Activity {
             // TODO
             final long[] mill = {0};
             // 在这里进行 http request.网络请求相关操作
-            OkHttpClient okHttpClient=new OkHttpClient();
-            Log.i("onResponse2", Api.doDetail +device_list);
+            OkHttpClient okHttpClient = new OkHttpClient();
+            Log.i("onResponse2", Api.doDetail + device_list);
             Request request = new Request.Builder()
-                    .url(Api.doDetail +device_list)
+                    .url(Api.doDetail + device_list)
                     .build();
             try {
                 Response response = okHttpClient.newCall(request).execute();
 //                Log.i("onResponse22", response.body().string());
 //                Log.i("onResponse2", response.body().string());
-                JSONObject jsonArrayyy= (JSONObject) JSONObject.parse(response.body().string());
+                JSONObject jsonArrayyy = (JSONObject) JSONObject.parse(response.body().string());
                 Log.i("onResponse2", jsonArrayyy.toString());
-                if(jsonArrayyy.getString("result")=="-1"){
+                if (jsonArrayyy.getString("result") == "-1") {
 //                    Toast.makeText(SettingFinishSuccessDetailActivity.this,"请求失败",Toast.LENGTH_SHORT).show();
-                }else{
-                    JSONArray realTimeDataTotal=jsonArrayyy.getJSONObject("DeviceWapper").getJSONArray("realTimeDataTotal");
-                    String updateDate=jsonArrayyy.getJSONObject("DeviceWapper").getString("updateDate");
+                } else {
+                    JSONArray realTimeDataTotal = jsonArrayyy.getJSONObject("DeviceWapper").getJSONArray("realTimeDataTotal");
+                    String updateDate = jsonArrayyy.getJSONObject("DeviceWapper").getString("updateDate");
                     Log.i("onResponse: ", updateDate);
-                    mill[0] =getTimeMillis(updateDate)+8*60*60*1000;
-                    Log.i("onResponse: ", mill[0]+"");
+                    mill[0] = getTimeMillis(updateDate) + 8 * 60 * 60 * 1000;
+                    Log.i("onResponse: ", mill[0] + "");
                     Date date = new Date(mill[0]);
-                    SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-                    String dateee=sdf.format(date);
-                    String datee=sp.getString("lastesttime","");
+                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                    String dateee = sdf.format(date);
+                    String datee = sp.getString("lastesttime", "");
                     Log.i("onResponse: ", datee);
                     Log.i("onResponse: 返回的时间", dateee);
                     //判断这个时间是否大于点击时间（数据的时间，点击时间）
-                    long longexpand=getTimeExpend(dateee,datee);
-                    Log.i("onResponse: 返回的时间1", longexpand+"");
-                    if(longexpand>0){
+                    long longexpand = getTimeExpend(dateee, datee);
+                    Log.i("onResponse: 返回的时间1", longexpand + "");
+                    if (longexpand > 0) {
                         //无数据
                         //老数据
-                        isyes1=false;
+                        isyes1 = false;
                         //失败的话判断这个时间是否大于15分钟
-                        qjbl =false;
-                    }else{
+                        qjbl = false;
+                    } else {
                         //有最新数据
-                        qjbl =true;
+                        qjbl = true;
                     }
                 }
             } catch (IOException e) {
@@ -346,13 +339,14 @@ public class SettingFinishSuccessDetailActivity extends Activity {
             }
             Message msg = new Message();
             Bundle data = new Bundle();
-            data.putBoolean("value",qjbl);
+            data.putBoolean("value", qjbl);
             msg.setData(data);
             handler.sendMessage(msg);
         }
     };
-    private  boolean achieveData(final String deviceId) throws IOException {
-        Log.i("onClick2: ", Api.doDetail +deviceId);
+
+    private boolean achieveData(final String deviceId) throws IOException {
+        Log.i("onClick2: ", Api.doDetail + deviceId);
 //        final long[] mill = {0};
 //        final BuildBean[] dialog = new BuildBean[1];
 //        final boolean[] istr = {false};
@@ -415,19 +409,21 @@ public class SettingFinishSuccessDetailActivity extends Activity {
 //            }
 //        });
         //数据获取不到
-        Log.i("onResponse: 返回的时间", qjbl+"");
+        Log.i("onResponse: 返回的时间", qjbl + "");
         return qjbl;
     }
-    private long getTimeExpend(String startTime, String endTime){
+
+    private long getTimeExpend(String startTime, String endTime) {
         //传入字串类型 2016/06/28 08:30
         long longStart = getTimeMillis(startTime); //获取开始时间毫秒数
         long longEnd = getTimeMillis(endTime);  //获取结束时间毫秒数
         long longExpend = longEnd - longStart;  //获取时间差
-        long longsecond=longExpend/1000;
+        long longsecond = longExpend / 1000;
 
 
         return longsecond;
     }
+
     private long getTimeMillis(String strTime) {
         long returnMillis = 0;
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");

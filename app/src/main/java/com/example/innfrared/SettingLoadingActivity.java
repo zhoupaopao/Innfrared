@@ -111,6 +111,20 @@ public class SettingLoadingActivity extends Activity {
                 progressBar.setProgress((int)longexpand);
 
                 if(longexpand<900){
+
+                    //判断是否有完成了，每1分钟执行一次
+                    String list_dbs=sp.getString("db_list","");
+                    String[]dsa=list_dbs.split(",");
+                    if(dsa.length==2){
+                        db_num1=dsa[0];
+                        db_num2=dsa[1];
+                    }else{
+                        db_num1=dsa[0];
+                    }
+                    if(longexpand%30==0){
+                        //能整除
+                        jyload(db_num1,db_num2);
+                    }
                     handler.postDelayed(this, 1000);
                     longexpand++;
                 }else{
@@ -133,12 +147,135 @@ public class SettingLoadingActivity extends Activity {
         handler.postDelayed(runnable, 1000);//每1秒执行一次runnable.
 
     }
+    private void jyload(final String db1, final String db2){
+
+        HttpRequest.get(Api.getAmmetersByDatalogerSn +SN, new JsonHttpRequestCallback() {
+            @Override
+            protected void onSuccess(Headers headers, JSONObject jsonObject) {
+                super.onSuccess(headers, jsonObject);
+                Log.i("onSuccess", jsonObject.toString());
+
+            }
+            @Override
+            public void onStart () {
+                super.onStart();
+            }
+            @Override
+            public void onFailure ( int errorCode, String msg){
+                super.onFailure(errorCode, msg);
+            }
+
+            @Override
+            public void onResponse(String response, Headers headers) {
+                super.onResponse(response, headers);
+                Log.i("onClick2: ", response);
+                JSONArray jsonArray=JSONArray.parseArray(response);
+                if(db2.equals("")){
+                    //只有一个电表
+                    for(int i=0;i<jsonArray.size();i++){
+                        String ssn=jsonArray.getJSONObject(i).getString("sn");
+                        String ddb1=achieve_format(db1).toString();
+                        Log.i("onResponse: ", ssn+"|"+ddb1);
+                        if(ssn.contains(ddb1)){
+                            isyes1=true;
+                            device_list=jsonArray.getJSONObject(i).getString("deviceId");
+                            //切换页面
+                            //查看改数据是否是最新的，比对时间
+                            nowdevice_id=device_list;
+                            Thread td1=new Thread(networkTask2);
+                            td1.start();
+                            try {
+                                td1.join();
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
+                            Log.i("isyes1: ", "312");
+                            break;
+                        }
+                    }
+                    Log.i("onResponse: ", isyes1+"");
+                }else{
+                    //两个电表
+
+                    isyes1=false;
+                    isyes2=false;
+                    String ddd1="";
+                    String ddd2="";
+                    Log.i("intent", achieve_format(db1)+"|"+achieve_format(db2));
+                    for(int i=0;i<jsonArray.size();i++){
+                        if(jsonArray.getJSONObject(i).getString("sn").equals(achieve_format(db1))){
+                            isyes1=true;
+                            Log.i("isyes1: ", "312");
+                            ddd1=jsonArray.getJSONObject(i).getString("deviceId");
+//                                        isyes1=achieveData(ddd1,"1");
+                            nowdevice_id1=ddd1;
+                            Thread tt1=new Thread(networkTask1);
+                            tt1.start();
+                            try {
+                                tt1.join();
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
+                            Log.i("onResponse: isyes1", qjbl+"");
+                            isyes1=qjbl;
+//                                        Log.i("isyes1", "true");
+//                                        if(device_list.equals("")){
+//                                            device_list=jsonArray.getJSONObject(i).getString("deviceId");
+//                                        }else{
+//                                            device_list=device_list+","+jsonArray.getJSONObject(i).getString("deviceId");
+//                                        }
+//
+//                                        continue;
+                        }
+                        if(jsonArray.getJSONObject(i).getString("sn").equals(achieve_format(db2))){
+                            isyes2=true;
+                            Log.i("isyes2: ", "312");
+                            ddd2=jsonArray.getJSONObject(i).getString("deviceId");
+//                                        isyes2=achieveData(ddd2,"2");
+                            nowdevice_id1=ddd2;
+                            Thread tt1=new Thread(networkTask1);
+                            tt1.start();
+                            try {
+                                tt1.join();
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
+                            Log.i("onResponse: isyes2", qjbl+"");
+                            isyes2=qjbl;
+//                                        Log.i("isyes2", "true");
+//                                        if(device_list.equals("")){
+//                                            device_list=jsonArray.getJSONObject(i).getString("deviceId");
+//                                        }else{
+//                                            device_list=device_list+","+jsonArray.getJSONObject(i).getString("deviceId");
+//                                        }
+//                                        continue;
+                        }
+                    }
+                    Log.i("onResponse: ", ddd1+"|"+ddd2);
+                    Log.i("intent", isyes1+"|"+isyes2);
+                    if(isyes1&&isyes2){
+                        //配置成功界面
+                        device_list=ddd1+","+ddd2;
+                        Intent intent=new Intent(SettingLoadingActivity.this,SettingFinishSuccessActivity.class);
+                        intent.putExtra("device_list",device_list);
+                        startActivity(intent);
+                        handler.removeCallbacks(runnable);
+                        finish();
+                    }else if((!isyes1)&&(!isyes2)){
+                    }else{
+                    }
+                }
+
+
+            }
+        });
+    }
     //自动补全12位，同时按照要求从后到前每隔2位重组
     private String achieve_format(String updata1){
         String las_sub="";
-        DecimalFormat df=new DecimalFormat("000000000000");
+        DecimalFormat df=new DecimalFormat("00000000000000");
         String str2=df.format(Long.parseLong(updata1));
-
+        str2=str2.substring(2,14);
         for(int i=0;i<6;i++){
             String sub_str=str2.substring(12-i*2-2, 12-i*2);
             las_sub=las_sub+sub_str;
@@ -381,35 +518,70 @@ public class SettingLoadingActivity extends Activity {
                 //显示数据校验
                 isyes1=val;
                 Log.i("isyes1", "onResponse: ");
-//                Intent intent=new Intent(SettingLoadingActivity.this,SettingFinishSuccessActivity.class);
-//                intent.putExtra("device_list",device_list);
-//                startActivity(intent);
-//                finish();
+                Intent intent=new Intent(SettingLoadingActivity.this,SettingFinishSuccessActivity.class);
+                intent.putExtra("device_list",device_list);
+                startActivity(intent);
+                finish();
+                handler.removeCallbacks(runnable);
             }else{
-                isyes1=val;
-                Log.i("isyes1", "onResponse2: ");
-//                Intent intent=new Intent(SettingLoadingActivity.this,SettingFinishActivity.class);
-//                intent.putExtra("device_list",device_list);
-//                startActivity(intent);
-//                finish();
-
-//                        if(longexpand>900){
-//                            Log.i("onResponse: ", "无数据");
-//                            img_status.setImageResource(R.mipmap.none_data);
-//                            tv_status.setText("无数据");
-//                        }else{
-//                            //换图标
-//                            Log.i("onResponse: ", "请耐心等待");
-//                            img_status.setImageResource(R.mipmap.wait);
-//                            tv_status.setText("无数据");
-//                            tv_status2.setText("请耐心等待...");
-//                        }
-
             }
         }
     };
 
+    Runnable networkTask2 = new Runnable() {
 
+        @Override
+        public void run() {
+            // TODO
+            final long[] mill = {0};
+            // 在这里进行 http request.网络请求相关操作
+            OkHttpClient okHttpClient=new OkHttpClient();
+            Request request = new Request.Builder()
+                    .url(Api.doDetail +nowdevice_id)
+                    .build();
+            try {
+                Response response = okHttpClient.newCall(request).execute();
+//                Log.i("onResponse22", response.body().string());
+//                Log.i("onResponse2", response.body().string());
+                JSONObject jsonArrayyy= (JSONObject) JSONObject.parse(response.body().string());
+                if(jsonArrayyy.getString("result")=="-1"){
+                    Toast.makeText(SettingLoadingActivity.this,"请求失败",Toast.LENGTH_SHORT).show();
+                }else{
+                    JSONArray realTimeDataTotal=jsonArrayyy.getJSONObject("DeviceWapper").getJSONArray("realTimeDataTotal");
+                    String updateDate=jsonArrayyy.getJSONObject("DeviceWapper").getString("updateDate");
+                    Log.i("onResponse: ", updateDate);
+                    mill[0] =getTimeMillis(updateDate)+8*60*60*1000;
+                    Log.i("onResponse: ", mill[0]+"");
+                    Date date = new Date(mill[0]);
+                    SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                    String dateee=sdf.format(date);
+                    String datee=sp.getString("lastesttime","");
+                    Log.i("onResponse: ", datee);
+                    Log.i("onResponse: 返回的时间", dateee);
+                    //判断这个时间是否大于点击时间（数据的时间，点击时间）
+                    long longexpand=getTimeExpend(dateee,datee);
+                    Log.i("onResponse: 返回的时间1", longexpand+"");
+                    if(longexpand>0){
+                        //无数据
+                        //老数据
+                        isyes1=false;
+                        //失败的话判断这个时间是否大于15分钟
+                        qjbl =false;
+                    }else{
+                        //有最新数据
+                        qjbl =true;
+                    }
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            Message msg = new Message();
+            Bundle data = new Bundle();
+            data.putBoolean("value",qjbl);
+            msg.setData(data);
+            handler2.sendMessage(msg);
+        }
+    };
     /**
      * 网络操作相关的子线程
      */

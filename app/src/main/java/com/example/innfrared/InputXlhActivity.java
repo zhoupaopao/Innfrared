@@ -138,12 +138,26 @@ public class InputXlhActivity extends Activity {
 //                            intent1.putExtra("longexpand",longexpand);
 //                            startActivity(intent1);
 //                        }
+                        SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                        String date=sdf.format(new java.util.Date());
+                        String lasttime=sp.getString("lastesttime","");
+                        //时间差（秒）
+                        long longexpand=getTimeExpend(lasttime,date);
+                        if(longexpand>900){
+                            //进入配置页面
+                            Intent intent2=new Intent();
+                            intent2.putExtra("SN",re_SN);
+                            intent2.putExtra("rem",true);//是读取内存
+                            intent2.setClass(InputXlhActivity.this,AmmeterSettingActivity.class);
+                            startActivity(intent2);
+                        }else{
+                            //进入等待
+                            Intent intent1=new Intent(InputXlhActivity.this,SettingLoadingActivity.class);
+                            intent1.putExtra("longexpand",longexpand);
+                            startActivity(intent1);
+                        }
                         //不比较时间，进入添加电表页面
-                        Intent intent2=new Intent();
-                        intent2.putExtra("SN",re_SN);
-                        intent2.putExtra("rem",true);//是读取内存
-                        intent2.setClass(InputXlhActivity.this,AmmeterSettingActivity.class);
-                        startActivity(intent2);
+
                     }else{
                         SharedPreferences.Editor editor=sp.edit();
                         editor.putString("SN",et_xlh.getText().toString());

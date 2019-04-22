@@ -31,10 +31,17 @@
             android:gravity="left"
             android:background="@null"
             android:inputType="number"
+            android:maxLength="14"
             android:textSize="@dimen/x16"
             android:hint="重新输入电表编号"/>
     </RelativeLayout>
-
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="30dp"
+        android:text="注意原电表将被删除"
+        android:textColor="@color/red"
+        android:gravity="center"
+        android:layout_gravity="center"/>
     <View
         android:layout_width="match_parent"
         android:layout_height="0.5dp"

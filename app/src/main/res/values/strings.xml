@@ -21,7 +21,7 @@
     <string name="first_step">第一步、检查红外接口</string>
     <string name="second_step">第二步、安装位置确认</string>
     <string name="third_step">第三步、接线方案</string>
-    <string name="forth_step">第四步、连接两台电表</string>
+    <string name="forth_step">第四步、抄读两台电表</string>
     <string name="fifth_step">第五步、走线安排</string>
     <string name="sixth_step">第六步、设备安装</string>
     <string name="seventh_step">第七步、导轨电源与采集器</string>

@@ -119,7 +119,7 @@ public class AmmeterSettingActivity extends Activity implements View.OnClickList
 //        nochange=true;
         String db_list=sp.getString("db_list","");
         Log.i("initData: ", db_list);
-        if(db_list.equals("")){
+        if(db_list.equals("")||db_list.equals(",")){
             //是空
         }else{
             String[]dsa=db_list.split(",");
@@ -180,8 +180,9 @@ public class AmmeterSettingActivity extends Activity implements View.OnClickList
             next.setBackgroundResource(R.drawable.btn_blue);
             //读取数据
             String db_list=sp.getString("db_list","");
-            if(db_list.equals("")){
-
+            if(db_list.equals("")||db_list.equals(",")){
+                cannext=false;
+                next.setBackgroundResource(R.drawable.btn_blue_dark);
             }else{
                 Log.i("initData: ", db_list);
                 String[]dsa=db_list.split(",");
@@ -280,11 +281,17 @@ public class AmmeterSettingActivity extends Activity implements View.OnClickList
                                     //执行编辑操作
                                     if(nowmoreid=="1"){
                                         //是第一组数据
+                                        //删除1
+                                        deletedb(need_updata1);
                                         tv_db_num1.setText(ed_text1.getText().toString());
                                         need_updata1=ed_text1.getText().toString();
+                                        localsave(need_updata1,need_updata2);
                                     }else{
+                                        //删除2
+                                        deletedb(need_updata2);
                                         tv_db_num2.setText(ed_text1.getText().toString());
                                         need_updata2=ed_text1.getText().toString();
+                                        localsave(need_updata1,need_updata2);
                                     }
                                 }
 
@@ -330,6 +337,8 @@ public class AmmeterSettingActivity extends Activity implements View.OnClickList
                                         //有两组数据
                                         //将第二组的数据赋值给1
                                         //2的数据删除
+                                        //删除1
+                                        deletedb(need_updata1);
                                         need_updata1=need_updata2;
                                         need_updata2="";
                                         ll2.setVisibility(View.GONE);
@@ -351,14 +360,13 @@ public class AmmeterSettingActivity extends Activity implements View.OnClickList
                                         more1.setVisibility(View.VISIBLE);
                                         more1.setImageResource(R.mipmap.add);
                                         str_review2="1";
-                                        SharedPreferences.Editor editor=sp.edit();
-                                        editor.putString("db_list",need_updata1);
-                                        editor.putString("lastesttime","");
-                                        editor.commit();
+                                        localsave(need_updata1,need_updata2);
                                     }else{
                                         //一组
                                         //如果ll2是显示的就隐藏，同时还原一组的布局
                                         //删除数据1
+                                        //删除1
+                                        deletedb(need_updata1);
                                         need_updata1="";
                                         tv_add_db.setText("添加电表");
                                         tv_db_num1.setText("");
@@ -373,14 +381,13 @@ public class AmmeterSettingActivity extends Activity implements View.OnClickList
                                         next.setBackgroundResource(R.drawable.btn_blue_dark);
                                         cannext=false;
                                         str_review1="1";
-                                        SharedPreferences.Editor editor=sp.edit();
-                                        editor.putString("db_list","");
-                                        editor.putString("lastesttime","");
-                                        editor.commit();
+                                        localsave(need_updata1,need_updata2);
                                     }
                                 }else{
                                     //删除第二组数据
                                     //有两组数据
+                                    //删除2
+                                    deletedb(need_updata2);
                                     ll2.setVisibility(View.GONE);
                                     need_updata2="";
                                     //给1赋值2的数据
@@ -399,10 +406,7 @@ public class AmmeterSettingActivity extends Activity implements View.OnClickList
                                     more1.setVisibility(View.VISIBLE);
                                     more1.setImageResource(R.mipmap.add);
                                     str_review2="1";
-                                    SharedPreferences.Editor editor=sp.edit();
-                                    editor.putString("db_list",need_updata1);
-                                    editor.putString("lastesttime","");
-                                    editor.commit();
+                                    localsave(need_updata1,need_updata2);
                                 }
                             }
                         });
@@ -554,6 +558,7 @@ public class AmmeterSettingActivity extends Activity implements View.OnClickList
                         nochange=false;
                         tv_add_db.setText("已匹配电表");
                         need_updata1=et_db1.getText().toString();
+                        localsave(need_updata1,need_updata2);
                         tv_db_num1.setText(et_db1.getText().toString());
                         et_db1.setVisibility(View.GONE);
                         et_db1.setText("");
@@ -598,6 +603,7 @@ public class AmmeterSettingActivity extends Activity implements View.OnClickList
                         nochange=false;
                         tv_add_db2.setVisibility(View.GONE);
                         need_updata2=et_db2.getText().toString();
+                        localsave(need_updata1,need_updata2);
                         tv_db_num2.setText(et_db2.getText().toString());
                         et_db2.setVisibility(View.GONE);
                         et_db2.setText("");
@@ -691,6 +697,7 @@ public class AmmeterSettingActivity extends Activity implements View.OnClickList
                         String lasttime=sp.getString("lastesttime","");
                         //时间差（秒）
                         long longexpand=getTimeExpend(lasttime,date);
+                        Log.e(getClass().getName(), longexpand+"");
                         if(longexpand>900){
                             //要么进入配置错误，要么进入配置成功
                             //请求接口查看进入对和错界面或者一对易错
@@ -709,6 +716,7 @@ public class AmmeterSettingActivity extends Activity implements View.OnClickList
                             //进入等待
                             Intent intent1=new Intent(AmmeterSettingActivity.this,SettingLoadingActivity.class);
                             intent1.putExtra("longexpand",longexpand);
+                            finish();
                             startActivity(intent1);
                         }
                     }else{
@@ -766,7 +774,7 @@ public class AmmeterSettingActivity extends Activity implements View.OnClickList
 //                    editor.putString("lastesttime","2019-04-12 10:46:15");
                     editor.commit();
                     startActivity(intent1);
-//                    finish();
+                    finish();
                 }else{
                     Toast.makeText(AmmeterSettingActivity.this,"保存电表异常",Toast.LENGTH_SHORT).show();
                 }
@@ -787,6 +795,17 @@ public class AmmeterSettingActivity extends Activity implements View.OnClickList
 
             }
         });
+    }
+    private void localsave(String db1,String db2){
+        SharedPreferences.Editor editor=sp.edit();
+//                        String db1=need_updata1;
+//                        String db2=need_updata2;
+        //这个地方记录SN号
+        Log.i("onClick: ", db1+","+db2);
+        editor.putString("SN",SN);
+        editor.putString("db_list",db1+","+db2);
+        editor.putString("lastesttime","");
+        editor.commit();
     }
     Handler handler1 = new Handler() {
         @Override
@@ -837,7 +856,7 @@ public class AmmeterSettingActivity extends Activity implements View.OnClickList
             // 在这里进行 http request.网络请求相关操作
             OkHttpClient okHttpClient=new OkHttpClient();
             Request request = new Request.Builder()
-                    .url(Api.doDetail +"101260863")
+                    .url(Api.doDetail +nowdevice_id1)
                     .build();
             try {
                 Response response = okHttpClient.newCall(request).execute();
@@ -1189,6 +1208,92 @@ public class AmmeterSettingActivity extends Activity implements View.OnClickList
         });
         return istr[0];
     }
+
+    private void deletedb(final String db1) {
+
+        Log.i("onResponse", Api.getAmmetersByDatalogerSn + SN);
+        HttpRequest.get(Api.getAmmetersByDatalogerSn + SN, new JsonHttpRequestCallback() {
+            @Override
+            protected void onSuccess(Headers headers, JSONObject jsonObject) {
+                super.onSuccess(headers, jsonObject);
+                Log.i("onSuccess", jsonObject.toString());
+            }
+
+            @Override
+            public void onStart() {
+                super.onStart();
+                dialog = DialogUIUtils.showLoading(AmmeterSettingActivity.this, "请求中...", true, true, false, true);
+                dialog.show();
+            }
+
+            @Override
+            public void onFailure(int errorCode, String msg) {
+                super.onFailure(errorCode, msg);
+            }
+
+            @Override
+            public void onResponse(String response, Headers headers) {
+                super.onResponse(response, headers);
+                Log.i("onClick2: ", response);
+                JSONArray jsonArray = JSONArray.parseArray(response);
+                //这里现在肯定有返回
+                String ddd1 = "";
+                //只有一个电表
+                for (int i = 0; i < jsonArray.size(); i++) {
+                    String ssn = jsonArray.getJSONObject(i).getString("sn");
+                    String ddb1 = achieve_format(db1).toString();
+                    if (ssn.contains(ddb1)) {
+                        ddd1 = jsonArray.getJSONObject(i).getString("deviceId");
+                        Log.i("onResponse: db_devid", ssn);
+                        Log.i("onResponse: db_devid", ddb1);
+                        //删除该deviceid
+                        deleteDeviceByDeviceId(ddd1);
+                        break;
+                    }
+                    if (i == jsonArray.size() - 1) {
+                        //最后一位了还是没有数据
+                        //单纯执行参数页面布局操作
+                        dialog.dialog.dismiss();
+                    }
+                }
+
+            }
+        });
+    }
+    private void deleteDeviceByDeviceId(final String deviceid) {
+
+        HttpRequest.get(Api.deleteDeviceByDeviceId + deviceid, new JsonHttpRequestCallback() {
+            @Override
+            protected void onSuccess(Headers headers, JSONObject jsonObject) {
+                super.onSuccess(headers, jsonObject);
+                Log.i("onSuccessdelete", jsonObject.toString());
+                if(jsonObject.getString("result").equals("1")){
+                    //删除成功
+                }
+                dialog.dialog.dismiss();
+            }
+
+            @Override
+            public void onStart() {
+                super.onStart();
+            }
+
+            @Override
+            public void onFailure(int errorCode, String msg) {
+                super.onFailure(errorCode, msg);
+                dialog.dialog.dismiss();
+            }
+
+            @Override
+            public void onResponse(String response, Headers headers) {
+                super.onResponse(response, headers);
+                Log.i("onClick2: ", response);
+
+
+            }
+        });
+    }
+
     private long getTimeExpend(String startTime, String endTime){
         //传入字串类型 2016/06/28 08:30
         long longStart = getTimeMillis(startTime); //获取开始时间毫秒数
@@ -1216,15 +1321,17 @@ public class AmmeterSettingActivity extends Activity implements View.OnClickList
     //自动补全12位，同时按照要求从后到前每隔2位重组
     private String achieve_format(String updata1){
         String las_sub="";
-        DecimalFormat df=new DecimalFormat("000000000000");
+        DecimalFormat df=new DecimalFormat("00000000000000");
         String str2=df.format(Long.parseLong(updata1));
-
+        str2=str2.substring(2,14);
+        Log.i("achieve_format: ", str2);
         for(int i=0;i<6;i++){
             String sub_str=str2.substring(12-i*2-2, 12-i*2);
             las_sub=las_sub+sub_str;
         }
 //        Log.i("AmmeterSettingActivity", "onClick: "+las_sub);
 //        Log.i("AmmeterSettingActivity", "onClick: "+str2);
+        Log.i("achieve_format2: ", las_sub);
         return las_sub;
     }
     private void hidekey(){

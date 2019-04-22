@@ -67,7 +67,7 @@
                 android:background="@null"
                 android:inputType="number"
                 android:textSize="@dimen/x14"
-                android:maxLength="12"
+                android:maxLength="14"
                 android:layout_centerVertical="true"
                 android:hint="请输入电表编号"/>
             <ImageView
@@ -133,7 +133,7 @@
                     android:textSize="@dimen/x14"
                     android:inputType="number"
                     android:layout_centerVertical="true"
-                    android:maxLength="12"
+                    android:maxLength="14"
                     android:hint="请输入电表编号"/>
 
                 <ImageView
