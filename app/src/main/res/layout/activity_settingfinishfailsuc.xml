@@ -97,7 +97,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:textColor="@color/black"
-                        android:text="@string/none_data"/>
+                        android:text="无数据，配置异常"/>
                     <TextView
                         android:layout_marginTop="@dimen/x5"
                         android:layout_width="wrap_content"

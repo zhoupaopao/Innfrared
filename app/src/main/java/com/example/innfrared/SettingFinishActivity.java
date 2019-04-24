@@ -24,6 +24,7 @@ public class SettingFinishActivity extends Activity {
     private TextView tv_db2;
     private String device_list="";
     private SharedPreferences sp;
+    private TextView pz_status;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -41,9 +42,11 @@ public class SettingFinishActivity extends Activity {
         call=findViewById(R.id.call);
         tv_db1=findViewById(R.id.tv_db1);
         tv_db2=findViewById(R.id.tv_db2);
+        pz_status=findViewById(R.id.pz_status);
     }
 
     private void initData() {
+        pz_status.setText("配置异常");
         sp=getSharedPreferences("Infrared",MODE_PRIVATE);
         device_list=getIntent().getStringExtra("device_list");
         String db_list=sp.getString("db_list","");

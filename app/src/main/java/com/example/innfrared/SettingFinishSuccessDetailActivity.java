@@ -58,6 +58,7 @@ public class SettingFinishSuccessDetailActivity extends Activity {
     private String device_list = "";
     //    final BuildBean[] dialog = new BuildBean[1];
     private BuildBean dialog;
+    private TextView pz_status;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -79,6 +80,7 @@ public class SettingFinishSuccessDetailActivity extends Activity {
         tv_status2 = findViewById(R.id.tv_status2);
         img_status = findViewById(R.id.img_status);
         sp = getSharedPreferences("Infrared", MODE_PRIVATE);
+        pz_status=findViewById(R.id.pz_status);
     }
 
     private void initData() {
@@ -175,7 +177,7 @@ public class SettingFinishSuccessDetailActivity extends Activity {
                     if (i == jsonArray.size() - 1) {
                         if (longexpand > 900) {
                             //超过15分钟了还没数据
-
+                            pz_status.setText("配置异常");
                             img_status.setImageResource(R.mipmap.none_data);
                             tv_status.setText("无数据");
                             tv_status2.setVisibility(View.GONE);
@@ -249,7 +251,7 @@ public class SettingFinishSuccessDetailActivity extends Activity {
                 tv_status2.setVisibility(View.VISIBLE);
                 if (longexpand > 900) {
                     //超过15分钟了还没数据
-
+                    pz_status.setText("配置异常");
                     img_status.setImageResource(R.mipmap.none_data);
                     tv_status.setText("无数据");
                     tv_status2.setVisibility(View.GONE);
